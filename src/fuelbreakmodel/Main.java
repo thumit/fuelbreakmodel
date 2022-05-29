@@ -422,6 +422,7 @@ public class Main {
 					// CREATE CONSTRAINTS-------------------------------------------------
 					// CREATE CONSTRAINTS-------------------------------------------------
 					// CREATE CONSTRAINTS-------------------------------------------------
+					// NOTE: Constraint bounds are optimized for better performance
 					// Constraints 2------------------------------------------------------
 					List<List<Integer>> c2_indexlist = new ArrayList<List<Integer>>();	
 					List<List<Double>> c2_valuelist = new ArrayList<List<Double>>();
