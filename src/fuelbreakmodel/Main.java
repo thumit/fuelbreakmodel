@@ -56,7 +56,7 @@ public class Main {
 					File output_variables_file = new File(input_folder + "/model_outputs/output_01_variables.txt");
 
 					double M = 10000;
-					double budget = 19;
+					double budget = 0;
 					// Read input1 --------------------------------------------------------------------------------------------
 					List<String> list = Files.readAllLines(Paths.get(input_1_file.getAbsolutePath()), StandardCharsets.UTF_8);
 					list.remove(0);	// Remove the first row (header)
@@ -560,29 +560,27 @@ public class Main {
 					// 4a
 					for (int e = 0; e < number_of_fires; e++) {
 						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
-							for (int j = i + 1; j < number_of_PODS[e]; j++) {
-								if (adjacent_PODS[e][i].contains(j)) {
-									// Add constraint
-									c4_indexlist.add(new ArrayList<Integer>());
-									c4_valuelist.add(new ArrayList<Double>());
-									
-									// Add Y[e][i][j]
-									c4_indexlist.get(c4_num).add(Y[e][i][j]);
-									c4_valuelist.get(c4_num).add((double) 1);
-									
-									// Add -X[e][i]
-									c4_indexlist.get(c4_num).add(X[e][i]);
-									c4_valuelist.get(c4_num).add((double) -1);
-									
-									// Add +X[e][j]
-									c4_indexlist.get(c4_num).add(X[e][j]);
-									c4_valuelist.get(c4_num).add((double) 1);
-									
-									// add bounds
-									c4_lblist.add((double) 0);			// Lower bound = 0
-									c4_ublist.add((double) 2);			// Upper bound = 2
-									c4_num++;
-								}
+							for (int j : adjacent_PODS[e][i]) {
+								// Add constraint
+								c4_indexlist.add(new ArrayList<Integer>());
+								c4_valuelist.add(new ArrayList<Double>());
+								
+								// Add Y[e][i][j]
+								c4_indexlist.get(c4_num).add(Y[e][i][j]);
+								c4_valuelist.get(c4_num).add((double) 1);
+								
+								// Add -X[e][i]
+								c4_indexlist.get(c4_num).add(X[e][i]);
+								c4_valuelist.get(c4_num).add((double) -1);
+								
+								// Add +X[e][j]
+								c4_indexlist.get(c4_num).add(X[e][j]);
+								c4_valuelist.get(c4_num).add((double) 1);
+								
+								// add bounds
+								c4_lblist.add((double) 0);			// Lower bound = 0
+								c4_ublist.add((double) 2);			// Upper bound = 2
+								c4_num++;
 							}
 						}
 					}
@@ -590,29 +588,27 @@ public class Main {
 					// 4b
 					for (int e = 0; e < number_of_fires; e++) {
 						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
-							for (int j = i + 1; j < number_of_PODS[e]; j++) {
-								if (adjacent_PODS[e][i].contains(j)) {
-									// Add constraint
-									c4_indexlist.add(new ArrayList<Integer>());
-									c4_valuelist.add(new ArrayList<Double>());
-									
-									// Add Y[e][i][j]
-									c4_indexlist.get(c4_num).add(Y[e][i][j]);
-									c4_valuelist.get(c4_num).add((double) 1);
-									
-									// Add +X[e][i]
-									c4_indexlist.get(c4_num).add(X[e][i]);
-									c4_valuelist.get(c4_num).add((double) 1);
-									
-									// Add -X[e][j]
-									c4_indexlist.get(c4_num).add(X[e][j]);
-									c4_valuelist.get(c4_num).add((double) -1);
-									
-									// add bounds
-									c4_lblist.add((double) 0);	// Lower bound = 0
-									c4_ublist.add((double) 2);	// Upper bound = 2
-									c4_num++;
-								}
+							for (int j : adjacent_PODS[e][i]) {
+								// Add constraint
+								c4_indexlist.add(new ArrayList<Integer>());
+								c4_valuelist.add(new ArrayList<Double>());
+								
+								// Add Y[e][i][j]
+								c4_indexlist.get(c4_num).add(Y[e][i][j]);
+								c4_valuelist.get(c4_num).add((double) 1);
+								
+								// Add +X[e][i]
+								c4_indexlist.get(c4_num).add(X[e][i]);
+								c4_valuelist.get(c4_num).add((double) 1);
+								
+								// Add -X[e][j]
+								c4_indexlist.get(c4_num).add(X[e][j]);
+								c4_valuelist.get(c4_num).add((double) -1);
+								
+								// add bounds
+								c4_lblist.add((double) 0);	// Lower bound = 0
+								c4_ublist.add((double) 2);	// Upper bound = 2
+								c4_num++;
 							}
 						}
 					}
@@ -648,25 +644,23 @@ public class Main {
 					
 					for (int e = 0; e < number_of_fires; e++) {
 						for (int i = 0; i < number_of_PODS[e]; i++) {
-							for (int j = 0; j < number_of_PODS[e]; j++) {
-								if (adjacent_PODS[e][i].contains(j)) {
-									// Add constraint
-									c5_indexlist.add(new ArrayList<Integer>());
-									c5_valuelist.add(new ArrayList<Double>());
-									
-									// Add B[e][i][j]
-									c5_indexlist.get(c5_num).add(B[e][i][j]);
-									c5_valuelist.get(c5_num).add((double) 1);
-									
-									// Add -X[e][i]
-									c5_indexlist.get(c5_num).add(X[e][i]);
-									c5_valuelist.get(c5_num).add((double) -1);
-									
-									// add bounds
-									c5_lblist.add((double) -1);		// Lower bound = -1 will make this equation not fail
-									c5_ublist.add((double) 0);		// Upper bound = 0
-									c5_num++;
-								}
+							for (int j : adjacent_PODS[e][i]) {
+								// Add constraint
+								c5_indexlist.add(new ArrayList<Integer>());
+								c5_valuelist.add(new ArrayList<Double>());
+								
+								// Add B[e][i][j]
+								c5_indexlist.get(c5_num).add(B[e][i][j]);
+								c5_valuelist.get(c5_num).add((double) 1);
+								
+								// Add -X[e][i]
+								c5_indexlist.get(c5_num).add(X[e][i]);
+								c5_valuelist.get(c5_num).add((double) -1);
+								
+								// add bounds
+								c5_lblist.add((double) -1);		// Lower bound = -1 will make this equation not fail
+								c5_ublist.add((double) 0);		// Upper bound = 0
+								c5_num++;
 							}
 						}
 					}
@@ -712,11 +706,9 @@ public class Main {
 								c6_valuelist.get(c6_num).add((double) 1);
 								
 								// Add -Sigma B[e][i][j]
-								for (int i = 0; i < number_of_PODS[e]; i++) {
-									if (adjacent_PODS[e][j].contains(i)) {
-										c6_indexlist.get(c6_num).add(B[e][i][j]);
-										c6_valuelist.get(c6_num).add((double) -1);
-									}
+								for (int i : adjacent_PODS[e][j]) {
+									c6_indexlist.get(c6_num).add(B[e][i][j]);
+									c6_valuelist.get(c6_num).add((double) -1);
 								}
 								// add bounds
 								c6_lblist.add((double) -adjacent_PODS[e][j].size());	// Lower bound = - total number of adjacent PODS of POD j
@@ -757,47 +749,45 @@ public class Main {
 					
 					for (int e = 0; e < number_of_fires; e++) {
 						for (int i = 0; i < number_of_PODS[e]; i++) {
-							for (int j = 0; j < number_of_PODS[e]; j++) {
-								if (adjacent_PODS[e][i].contains(j)) {
-									// 7a
-									if (i < j) {
-										// Add constraint
-										c7_indexlist.add(new ArrayList<Integer>());
-										c7_valuelist.add(new ArrayList<Double>());
-										
-										// Add B[e][i][j]
-										c7_indexlist.get(c7_num).add(B[e][i][j]);
-										c7_valuelist.get(c7_num).add((double) 1);
-										
-										// Add Y[e][i][j]
-										c7_indexlist.get(c7_num).add(Y[e][i][j]);
-										c7_valuelist.get(c7_num).add((double) 1);
-										
-										// add bounds
-										c7_lblist.add((double) 0);		// Lower bound = 0
-										c7_ublist.add((double) 1);		// Upper bound = 1
-										c7_num++;
-									}
+							for (int j : adjacent_PODS[e][i]) {
+								// 7a
+								if (i < j) {
+									// Add constraint
+									c7_indexlist.add(new ArrayList<Integer>());
+									c7_valuelist.add(new ArrayList<Double>());
 									
-									// 7b
-									if (i > j) {
-										// Add constraint
-										c7_indexlist.add(new ArrayList<Integer>());
-										c7_valuelist.add(new ArrayList<Double>());
-										
-										// Add B[e][i][j]
-										c7_indexlist.get(c7_num).add(B[e][i][j]);
-										c7_valuelist.get(c7_num).add((double) 1);
-										
-										// Add Y[e][j][i]
-										c7_indexlist.get(c7_num).add(Y[e][j][i]);
-										c7_valuelist.get(c7_num).add((double) 1);
-										
-										// add bounds
-										c7_lblist.add((double) 0);		// Lower bound = 0
-										c7_ublist.add((double) 1);		// Upper bound = 1
-										c7_num++;
-									}
+									// Add B[e][i][j]
+									c7_indexlist.get(c7_num).add(B[e][i][j]);
+									c7_valuelist.get(c7_num).add((double) 1);
+									
+									// Add Y[e][i][j]
+									c7_indexlist.get(c7_num).add(Y[e][i][j]);
+									c7_valuelist.get(c7_num).add((double) 1);
+									
+									// add bounds
+									c7_lblist.add((double) 0);		// Lower bound = 0
+									c7_ublist.add((double) 1);		// Upper bound = 1
+									c7_num++;
+								}
+								
+								// 7b
+								if (i > j) {
+									// Add constraint
+									c7_indexlist.add(new ArrayList<Integer>());
+									c7_valuelist.add(new ArrayList<Double>());
+									
+									// Add B[e][i][j]
+									c7_indexlist.get(c7_num).add(B[e][i][j]);
+									c7_valuelist.get(c7_num).add((double) 1);
+									
+									// Add Y[e][j][i]
+									c7_indexlist.get(c7_num).add(Y[e][j][i]);
+									c7_valuelist.get(c7_num).add((double) 1);
+									
+									// add bounds
+									c7_lblist.add((double) 0);		// Lower bound = 0
+									c7_ublist.add((double) 1);		// Upper bound = 1
+									c7_num++;
 								}
 							}
 						}
@@ -881,9 +871,9 @@ public class Main {
 					int c9_num = 0;
 					
 					for (int e = 0; e < number_of_fires; e++) {
-						for (int i = 0; i < number_of_PODS[e]; i++) {
-							for (int j = 0; j < number_of_PODS[e]; j++) {
-								if (adjacent_PODS[e][i].contains(j)) {
+						for (int j = 0; j < number_of_PODS[e]; j++) {
+							for (int i : adjacent_PODS[e][j]) {
+								if (j != ignition_POD[e]) {
 									// 9a
 									// Add constraint
 									c9_indexlist.add(new ArrayList<Integer>());
@@ -930,6 +920,33 @@ public class Main {
 									c9_ublist.add((double) n[e] + 1);				// Upper bound is modified to optimize better
 									c9_num++;
 								}
+							}
+						}
+					}
+					
+					// 9c
+					for (int e = 0; e < number_of_fires; e++) {
+						for (int j = 0; j < number_of_PODS[e]; j++) {
+							if (j != ignition_POD[e]) {
+								// Add constraint
+								c9_indexlist.add(new ArrayList<Integer>());
+								c9_valuelist.add(new ArrayList<Double>());
+								
+								// Add F[e][j]
+								c9_indexlist.get(c9_num).add(F[e][j]);
+								c9_valuelist.get(c9_num).add((double) 1);
+								
+								// Add -(n[e] + 1)*B[e][i][j]
+								for (int i : adjacent_PODS[e][j]) {
+									c9_indexlist.get(c9_num).add(B[e][i][j]);
+									c9_valuelist.get(c9_num).add((double) -n[e] - 1);
+								}
+								
+								// add bounds
+								// c9_lblist.add((double) Integer.MIN_VALUE);								// Lower bound
+								c9_lblist.add((double) -number_of_PODS[e] * adjacent_PODS[e][j].size());	// Lower bound is modified to optimize better
+								c9_ublist.add((double) 0);													// Upper bound = 0
+								c9_num++;
 							}
 						}
 					}
