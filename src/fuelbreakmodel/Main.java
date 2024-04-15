@@ -54,8 +54,10 @@ public class Main {
 					File solution_file = new File(input_folder + "/model_outputs/solution.sol");
 					File output_variables_file = new File(input_folder + "/model_outputs/output_01_variables.txt");
 
-					double M = 10000;
+					
 					double budget = 0;
+					
+					
 					// Read input1 --------------------------------------------------------------------------------------------
 					List<String> list = Files.readAllLines(Paths.get(input_1_file.getAbsolutePath()), StandardCharsets.UTF_8);
 					list.remove(0);	// Remove the first row (header)
@@ -265,22 +267,7 @@ public class Main {
 						Q[b] = nvars;
 						nvars++;
 					}
-					
-//					int[] D = new int[number_of_filtered_fuelbreaks];	// D(b) is total invest in the fuel break b. D = D1 + D2 +D3
-//					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
-//						int fuelbreak_ID = b + 1;
-//						String var_name = "D_" + fuelbreak_ID;
-//						Information_Variable var_info = new Information_Variable(var_name);
-//						var_info_list.add(var_info);
-//						objlist.add((double) 0);
-//						vnamelist.add(var_name);
-//						vlblist.add((double) 0);
-//						vublist.add(Double.MAX_VALUE);
-//						vtlist.add(IloNumVarType.Float);
-//						D[b] = nvars;
-//						nvars++;
-//					}
-					
+								
 					int[] D1 = new int[number_of_filtered_fuelbreaks];
 					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
 						int fuelbreak_ID = b + 1;
@@ -428,31 +415,6 @@ public class Main {
 					List<Double> c2_lblist = new ArrayList<Double>();	
 					List<Double> c2_ublist = new ArrayList<Double>();
 					int c2_num = 0;
-					
-//					for (int e = 0; e < number_of_fires; e++) {
-//						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
-//							for (int j = i + 1; j < number_of_PODS[e]; j++) {
-//								for (int b : b_list[e][i][j]) {
-//									// Add constraint
-//									c2_indexlist.add(new ArrayList<Integer>());
-//									c2_valuelist.add(new ArrayList<Double>());
-//				
-//									// Add Y[e][i][j]
-//									c2_indexlist.get(c2_num).add(Y[e][i][j]);
-//									c2_valuelist.get(c2_num).add((double) 1);
-//									
-//									// Add -Q[b]/M
-//									c2_indexlist.get(c2_num).add(Q[b]);
-//									c2_valuelist.get(c2_num).add((double) -1 / M);
-//				
-//									// add bounds
-//									c2_lblist.add((double) -1);						// Lower bound set to -1 instead of INF (infeasibility --> cutoff)
-//									c2_ublist.add((double) 1 - fl[e][i][j] / M);	// Upper bound = 1 -fl/M
-//									c2_num++;
-//								}
-//							}
-//						}
-//					}
 					
 					for (int e = 0; e < number_of_fires; e++) {
 						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
@@ -683,7 +645,7 @@ public class Main {
 								
 								// add bounds
 								c6_lblist.add((double) 0);			// Lower bound = 0
-								c6_ublist.add((double) 2);			// Upper bound = 2
+								c6_ublist.add((double) 2);			// Upper bound = 2 (bound is modified to optimize better)
 								c6_num++;
 							}
 						}
@@ -711,7 +673,7 @@ public class Main {
 								
 								// add bounds
 								c6_lblist.add((double) 0);	// Lower bound = 0
-								c6_ublist.add((double) 2);	// Upper bound = 2
+								c6_ublist.add((double) 2);	// Upper bound = 2 (bound is modified to optimize better)
 								c6_num++;
 							}
 						}
