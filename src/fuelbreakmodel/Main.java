@@ -38,7 +38,6 @@ public class Main {
 				main = new Main();
 			}
 		});
-
 	}
 	
 	public Main() {
@@ -550,69 +549,37 @@ public class Main {
 					System.out.println("Total constraints as in PRISM model formulation eq. (3):   " + c3_num + "             " + dateFormat.format(new Date()));
 					
 					
-					// Constraints 4------------------------------------------------------
+					// Constraints 4------------------------------------------------------		
 					List<List<Integer>> c4_indexlist = new ArrayList<List<Integer>>();	
 					List<List<Double>> c4_valuelist = new ArrayList<List<Double>>();
 					List<Double> c4_lblist = new ArrayList<Double>();	
 					List<Double> c4_ublist = new ArrayList<Double>();
 					int c4_num = 0;
 					
-					// 4a
 					for (int e = 0; e < number_of_fires; e++) {
-						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
-							for (int j : adjacent_PODS[e][i]) {
+						for (int j = 0; j < number_of_PODS[e]; j++) {
+							if (j != ignition_POD[e]) {	// if this is not the ignition POD
 								// Add constraint
 								c4_indexlist.add(new ArrayList<Integer>());
 								c4_valuelist.add(new ArrayList<Double>());
 								
-								// Add Y[e][i][j]
-								c4_indexlist.get(c4_num).add(Y[e][i][j]);
-								c4_valuelist.get(c4_num).add((double) 1);
-								
-								// Add -X[e][i]
-								c4_indexlist.get(c4_num).add(X[e][i]);
-								c4_valuelist.get(c4_num).add((double) -1);
-								
-								// Add +X[e][j]
+								// Add X[e][j]
 								c4_indexlist.get(c4_num).add(X[e][j]);
 								c4_valuelist.get(c4_num).add((double) 1);
 								
+								// Add -Sigma B[e][i][j]
+								for (int i : adjacent_PODS[e][j]) {
+									c4_indexlist.get(c4_num).add(B[e][i][j]);
+									c4_valuelist.get(c4_num).add((double) -1);
+								}
 								// add bounds
-								c4_lblist.add((double) 0);			// Lower bound = 0
-								c4_ublist.add((double) 2);			// Upper bound = 2
+								c4_lblist.add((double) -adjacent_PODS[e][j].size());	// Lower bound = - total number of adjacent PODS of POD j
+								c4_ublist.add((double) 0);								// Upper bound = 0
 								c4_num++;
 							}
 						}
 					}
 					
-					// 4b
-					for (int e = 0; e < number_of_fires; e++) {
-						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
-							for (int j : adjacent_PODS[e][i]) {
-								// Add constraint
-								c4_indexlist.add(new ArrayList<Integer>());
-								c4_valuelist.add(new ArrayList<Double>());
-								
-								// Add Y[e][i][j]
-								c4_indexlist.get(c4_num).add(Y[e][i][j]);
-								c4_valuelist.get(c4_num).add((double) 1);
-								
-								// Add +X[e][i]
-								c4_indexlist.get(c4_num).add(X[e][i]);
-								c4_valuelist.get(c4_num).add((double) 1);
-								
-								// Add -X[e][j]
-								c4_indexlist.get(c4_num).add(X[e][j]);
-								c4_valuelist.get(c4_num).add((double) -1);
-								
-								// add bounds
-								c4_lblist.add((double) 0);	// Lower bound = 0
-								c4_ublist.add((double) 2);	// Upper bound = 2
-								c4_num++;
-							}
-						}
-					}
-
 					double[] c4_lb = Stream.of(c4_lblist.toArray(new Double[c4_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
 					double[] c4_ub = Stream.of(c4_ublist.toArray(new Double[c4_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
 					int[][] c4_index = new int[c4_num][];
@@ -634,7 +601,7 @@ public class Main {
 					c4_ublist = null;
 					System.out.println("Total constraints as in PRISM model formulation eq. (4):   " + c4_num + "             " + dateFormat.format(new Date()));
 					
-					
+										
 					// Constraints 5------------------------------------------------------		
 					List<List<Integer>> c5_indexlist = new ArrayList<List<Integer>>();	
 					List<List<Double>> c5_valuelist = new ArrayList<List<Double>>();
@@ -685,39 +652,71 @@ public class Main {
 					c5_lblist = null;	
 					c5_ublist = null;
 					System.out.println("Total constraints as in PRISM model formulation eq. (5):   " + c5_num + "             " + dateFormat.format(new Date()));
+						
 					
-					
-					// Constraints 6------------------------------------------------------		
+					// Constraints 6------------------------------------------------------
 					List<List<Integer>> c6_indexlist = new ArrayList<List<Integer>>();	
 					List<List<Double>> c6_valuelist = new ArrayList<List<Double>>();
 					List<Double> c6_lblist = new ArrayList<Double>();	
 					List<Double> c6_ublist = new ArrayList<Double>();
 					int c6_num = 0;
 					
+					// 6a
 					for (int e = 0; e < number_of_fires; e++) {
-						for (int j = 0; j < number_of_PODS[e]; j++) {
-							if (j != ignition_POD[e]) {	// if this is not the ignition POD
+						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
+							for (int j : adjacent_PODS[e][i]) {
 								// Add constraint
 								c6_indexlist.add(new ArrayList<Integer>());
 								c6_valuelist.add(new ArrayList<Double>());
 								
-								// Add X[e][j]
+								// Add Y[e][i][j]
+								c6_indexlist.get(c6_num).add(Y[e][i][j]);
+								c6_valuelist.get(c6_num).add((double) 1);
+								
+								// Add -X[e][i]
+								c6_indexlist.get(c6_num).add(X[e][i]);
+								c6_valuelist.get(c6_num).add((double) -1);
+								
+								// Add +X[e][j]
 								c6_indexlist.get(c6_num).add(X[e][j]);
 								c6_valuelist.get(c6_num).add((double) 1);
 								
-								// Add -Sigma B[e][i][j]
-								for (int i : adjacent_PODS[e][j]) {
-									c6_indexlist.get(c6_num).add(B[e][i][j]);
-									c6_valuelist.get(c6_num).add((double) -1);
-								}
 								// add bounds
-								c6_lblist.add((double) -adjacent_PODS[e][j].size());	// Lower bound = - total number of adjacent PODS of POD j
-								c6_ublist.add((double) 0);								// Upper bound = 0
+								c6_lblist.add((double) 0);			// Lower bound = 0
+								c6_ublist.add((double) 2);			// Upper bound = 2
 								c6_num++;
 							}
 						}
 					}
 					
+					// 6b
+					for (int e = 0; e < number_of_fires; e++) {
+						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
+							for (int j : adjacent_PODS[e][i]) {
+								// Add constraint
+								c6_indexlist.add(new ArrayList<Integer>());
+								c6_valuelist.add(new ArrayList<Double>());
+								
+								// Add Y[e][i][j]
+								c6_indexlist.get(c6_num).add(Y[e][i][j]);
+								c6_valuelist.get(c6_num).add((double) 1);
+								
+								// Add +X[e][i]
+								c6_indexlist.get(c6_num).add(X[e][i]);
+								c6_valuelist.get(c6_num).add((double) 1);
+								
+								// Add -X[e][j]
+								c6_indexlist.get(c6_num).add(X[e][j]);
+								c6_valuelist.get(c6_num).add((double) -1);
+								
+								// add bounds
+								c6_lblist.add((double) 0);	// Lower bound = 0
+								c6_ublist.add((double) 2);	// Upper bound = 2
+								c6_num++;
+							}
+						}
+					}
+
 					double[] c6_lb = Stream.of(c6_lblist.toArray(new Double[c6_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
 					double[] c6_ub = Stream.of(c6_ublist.toArray(new Double[c6_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
 					int[][] c6_index = new int[c6_num][];
