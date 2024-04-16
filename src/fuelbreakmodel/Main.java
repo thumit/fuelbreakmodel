@@ -55,7 +55,7 @@ public class Main {
 					File output_variables_file = new File(input_folder + "/model_outputs/output_01_variables.txt");
 
 					
-					double budget = 0;
+					double budget = 10;
 					
 					
 					// Read input1 --------------------------------------------------------------------------------------------
@@ -132,6 +132,7 @@ public class Main {
 						}
 					}
 					
+					
 					// Read input4 --------------------------------------------------------------------------------------------
 					list = Files.readAllLines(Paths.get(input_4_file.getAbsolutePath()), StandardCharsets.UTF_8);
 					list.remove(0);	// Remove the first row (header)
@@ -148,20 +149,17 @@ public class Main {
 						}
 					}
 					
-					int number_of_filtered_fuelbreaks = total_rows;				// identified from all the fuel breaks after step 1 line 135 in the manuscript 
-					double[] q0 = new double[number_of_filtered_fuelbreaks]; 	// the current capacity of a fuel break
-					double[] d1 = new double[number_of_filtered_fuelbreaks]; 	// parameter for D1 variable
-					double[] d2 = new double[number_of_filtered_fuelbreaks]; 	// parameter for D2 variable
-					double[] d3 = new double[number_of_filtered_fuelbreaks]; 	// parameter for D3 variable
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
-						q0[b] = Double.parseDouble(string_data[b][2]);
-						d1[b] = Double.parseDouble(string_data[b][3]);
-						d2[b] = Double.parseDouble(string_data[b][4]);
-						d3[b] = Double.parseDouble(string_data[b][5]);
-						// System.out.println(q0[b] + " " + d1[b] + " " + d2[b] + " " + d3[b]);
-					}
-					
-					// Need to read the FuealBreak ID conversion here as well. Do it later
+					int number_of_fuelbreaks = total_rows;				// or number of fuel break IDs
+					double[] q0 = new double[number_of_fuelbreaks]; 	// the current capacity of a fuel break
+					double[] d1 = new double[number_of_fuelbreaks]; 	// parameter for D1 variable
+					double[] d2 = new double[number_of_fuelbreaks]; 	// parameter for D2 variable
+					double[] d3 = new double[number_of_fuelbreaks]; 	// parameter for D3 variable
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
+						q0[b] = Double.parseDouble(string_data[b][1]);
+						d1[b] = Double.parseDouble(string_data[b][2]);
+						d2[b] = Double.parseDouble(string_data[b][3]);
+						d3[b] = Double.parseDouble(string_data[b][4]);
+					}					
 					
 					
 					// Read input3 --------------------------------------------------------------------------------------------
@@ -191,10 +189,10 @@ public class Main {
 					
 					for (int i = 0; i < total_rows; i++) {
 						int ee = Integer.parseInt(string_data[i][0]) - 1;
-						String[] pairPODs = string_data[i][4].split(",");
+						String[] pairPODs = string_data[i][2].split(",");
 						int ii = Integer.parseInt(pairPODs[0]) - 1;
 						int jj = Integer.parseInt(pairPODs[1]) - 1;
-						fl[ee][ii][jj] = Double.parseDouble(string_data[i][5]);
+						fl[ee][ii][jj] = Double.parseDouble(string_data[i][3]);
 					}
 					
 					// Need to add information to this list: Note add POD ID in the file - 1 so all PODs starts from 0
@@ -211,11 +209,11 @@ public class Main {
 					
 					for (int i = 0; i < total_rows; i++) {
 						int ee = Integer.parseInt(string_data[i][0]) - 1;
-						String[] pairPODs = string_data[i][4].split(",");
+						String[] pairPODs = string_data[i][2].split(",");
 						int ii = Integer.parseInt(pairPODs[0]) - 1;
 						int jj = Integer.parseInt(pairPODs[1]) - 1;
-						String[] filteredFuelBreakIDs = string_data[i][2].split(",");
-						for (String s : filteredFuelBreakIDs) {
+						String[] FuelBreakIDs = string_data[i][1].split(",");
+						for (String s : FuelBreakIDs) {
 							int id = Integer.parseInt(s) - 1;
 							b_list[ee][ii][jj].add(id);
 						}
@@ -253,8 +251,8 @@ public class Main {
 						}
 					}
 					
-					int[] Q = new int[number_of_filtered_fuelbreaks];	// Q(b)	is the upper bound flame length for the fuel break b to sustain
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
+					int[] Q = new int[number_of_fuelbreaks];	// Q(b)	is the upper bound flame length for the fuel break b to sustain
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
 						int fuelbreak_ID = b + 1;
 						String var_name = "Q_" + fuelbreak_ID;
 						Information_Variable var_info = new Information_Variable(var_name);
@@ -268,8 +266,8 @@ public class Main {
 						nvars++;
 					}
 								
-					int[] D1 = new int[number_of_filtered_fuelbreaks];
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
+					int[] D1 = new int[number_of_fuelbreaks];
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
 						int fuelbreak_ID = b + 1;
 						String var_name = "D1_" + fuelbreak_ID;
 						Information_Variable var_info = new Information_Variable(var_name);
@@ -283,8 +281,8 @@ public class Main {
 						nvars++;
 					}
 					
-					int[] D2 = new int[number_of_filtered_fuelbreaks];
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
+					int[] D2 = new int[number_of_fuelbreaks];
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
 						int fuelbreak_ID = b + 1;
 						String var_name = "D2_" + fuelbreak_ID;
 						Information_Variable var_info = new Information_Variable(var_name);
@@ -298,8 +296,8 @@ public class Main {
 						nvars++;
 					}
 					
-					int[] D3 = new int[number_of_filtered_fuelbreaks];
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
+					int[] D3 = new int[number_of_fuelbreaks];
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
 						int fuelbreak_ID = b + 1;
 						String var_name = "D3_" + fuelbreak_ID;
 						Information_Variable var_info = new Information_Variable(var_name);
@@ -941,7 +939,7 @@ public class Main {
 					List<Double> c10_ublist = new ArrayList<Double>();
 					int c10_num = 0;
 					
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
 						// Add constraint
 						c10_indexlist.add(new ArrayList<Integer>());
 						c10_valuelist.add(new ArrayList<Double>());
@@ -1003,7 +1001,7 @@ public class Main {
 					c11_valuelist.add(new ArrayList<Double>());
 					
 					// Add Sigma D
-					for (int b = 0; b < number_of_filtered_fuelbreaks; b++) {
+					for (int b = 0; b < number_of_fuelbreaks; b++) {
 						// Add D1[b]
 						c11_indexlist.get(c11_num).add(D1[b]);
 						c11_valuelist.get(c11_num).add((double) 1);
