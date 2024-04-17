@@ -178,24 +178,8 @@ public class Main {
 						}
 					}
 					
-					double[][][] fl = null;	// fl(e,ie,je) with e is the FireID, i and j are the dynamic POD
-					fl = new double[number_of_fires][][];
-					for (int e = 0; e < number_of_fires; e++) {
-						fl[e] = new double[number_of_PODS[e] - 1][];
-						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
-							fl[e][i] = new double[number_of_PODS[e]];
-						}
-					}
-					
-					for (int i = 0; i < total_rows; i++) {
-						int ee = Integer.parseInt(string_data[i][0]) - 1;
-						String[] pairPODs = string_data[i][2].split(",");
-						int ii = Integer.parseInt(pairPODs[0]) - 1;
-						int jj = Integer.parseInt(pairPODs[1]) - 1;
-						fl[ee][ii][jj] = Double.parseDouble(string_data[i][3]);
-					}
-					
-					// Need to add information to this list: Note add POD ID in the file - 1 so all PODs starts from 0
+					// Note add POD ID in the file - 1 so all PODs starts from 0
+					// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e
 					List<Integer>[][][] b_list = new ArrayList[number_of_fires][][];
 					for (int e = 0; e < number_of_fires; e++) {	
 						b_list[e] = new ArrayList[number_of_PODS[e] - 1][];
@@ -216,6 +200,30 @@ public class Main {
 						for (String s : FuelBreakIDs) {
 							int id = Integer.parseInt(s) - 1;
 							b_list[ee][ii][jj].add(id);
+						}
+					}
+					
+					// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e
+					List<Double>[][][] fl_list = new ArrayList[number_of_fires][][];
+					for (int e = 0; e < number_of_fires; e++) {	
+						fl_list[e] = new ArrayList[number_of_PODS[e] - 1][];
+						for (int i = 0; i < number_of_PODS[e] - 1; i++) {
+							fl_list[e][i] = new ArrayList[number_of_PODS[e]];
+							for (int j = i + 1; j < number_of_PODS[e]; j++) {
+								fl_list[e][i][j] = new ArrayList<Double>();
+							}
+						}
+					}
+					
+					for (int i = 0; i < total_rows; i++) {
+						int ee = Integer.parseInt(string_data[i][0]) - 1;
+						String[] pairPODs = string_data[i][2].split(",");
+						int ii = Integer.parseInt(pairPODs[0]) - 1;
+						int jj = Integer.parseInt(pairPODs[1]) - 1;
+						String[] breaks_max_fls = string_data[i][3].split(",");
+						for (String s : breaks_max_fls) {
+							double val = Double.parseDouble(s);
+							fl_list[ee][ii][jj].add(val);
 						}
 					}
 					
@@ -424,7 +432,7 @@ public class Main {
 				
 									// Add fl[e][i][j] * Y[e][i][j]
 									c2_indexlist.get(c2_num).add(Y[e][i][j]);
-									c2_valuelist.get(c2_num).add(fl[e][i][j]);
+									c2_valuelist.get(c2_num).add(fl_list[e][i][j].get(b_list[e][i][j].indexOf(b)));		// index of break_id in the b_list is associated with index of that break flame length in the fl_list
 									
 									// Add -Q[b]
 									c2_indexlist.get(c2_num).add(Q[b]);
