@@ -72,6 +72,7 @@ public class Main {
 				List<Integer>[][][] b_list = data_processing.get_b_list();		// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e
 				List<Double>[][][] fl_list = data_processing.get_fl_list();		// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e
 				
+				double M = 1000000000;
 				
 				// DEFINITIONS --------------------------------------------------------------
 				// DEFINITIONS --------------------------------------------------------------
@@ -126,7 +127,7 @@ public class Main {
 					String var_name = "D1_" + fuelbreak_ID;
 					Information_Variable var_info = new Information_Variable(var_name);
 					var_info_list.add(var_info);
-					objlist.add((double) 0);
+					objlist.add((double) 1 / M);
 					vnamelist.add(var_name);
 					vlblist.add((double) 0);
 					vublist.add(Double.MAX_VALUE);
@@ -141,7 +142,7 @@ public class Main {
 					String var_name = "D2_" + fuelbreak_ID;
 					Information_Variable var_info = new Information_Variable(var_name);
 					var_info_list.add(var_info);
-					objlist.add((double) 0);
+					objlist.add((double) 1 / M);
 					vnamelist.add(var_name);
 					vlblist.add((double) 0);
 					vublist.add(Double.MAX_VALUE);
@@ -156,7 +157,7 @@ public class Main {
 					String var_name = "D3_" + fuelbreak_ID;
 					Information_Variable var_info = new Information_Variable(var_name);
 					var_info_list.add(var_info);
-					objlist.add((double) 0);
+					objlist.add((double) 1 / M);
 					vnamelist.add(var_name);
 					vlblist.add((double) 0);
 					vublist.add(Double.MAX_VALUE);
