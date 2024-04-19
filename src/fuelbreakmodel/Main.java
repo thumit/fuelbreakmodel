@@ -56,7 +56,7 @@ public class Main {
 					File output_variables_file = new File(input_folder + "/model_outputs/output_01_variables.txt");
 
 					double M = 10000;
-					double budget = 19;
+					double budget = 30;
 					// Read input1 --------------------------------------------------------------------------------------------
 					List<String> list = Files.readAllLines(Paths.get(input_1_file.getAbsolutePath()), StandardCharsets.UTF_8);
 					list.remove(0);	// Remove the first row (header)
