@@ -10,6 +10,7 @@ import java.util.List;
 
 public class example_data_processing {
 	private int number_of_fires;	// number of fires
+	private int[] original_fire_id; // the original fire_id: which is "fire_id" in the input_01_file of the example, or "FIRE_NUMBE" in the great basin attribute table
 	private int[] number_of_PODS; 	// number of dynamic PODs for each fire
 	private int[] n; 				// number of dynamic PODs for each fire minus one
 	private int[] ignition_POD; 	// the ignition POD of each fire
@@ -45,13 +46,15 @@ public class example_data_processing {
 			}
 			
 			number_of_fires = total_rows;				// number of fires
+			original_fire_id = new int[number_of_fires];// the original fire_id: which is "fire_id" in the input_01_file of the example, or "FIRE_NUMBE" in the great basin attribute table
 			number_of_PODS = new int[number_of_fires]; 	// number of dynamic PODs for each fire
 			n = new int[number_of_fires]; 				// number of dynamic PODs for each fire minus one
 			ignition_POD = new int[number_of_fires]; 	// the ignition POD of each fire
 			for (int e = 0; e < number_of_fires; e++) {
+				original_fire_id[e] = data[e][0];	// we will print the original fire id in the problem and solution files.
 				number_of_PODS[e] = data[e][1];
 				n[e] = number_of_PODS[e] - 1;
-				ignition_POD[e] = data[e][2] - 1;	// Ignition POD 1 will be indexed as 0 in the model
+				ignition_POD[e] = data[e][2] - 1;	// Ignition POD 1 will be indexed as 0 in the model		
 			}
 	
 			
@@ -118,7 +121,7 @@ public class example_data_processing {
 				}
 			}
 			
-			number_of_fuelbreaks = total_rows;				// or number of fuel break IDs
+			number_of_fuelbreaks = total_rows;
 			q0 = new double[number_of_fuelbreaks]; 	// the current capacity of a fuel break
 			d1 = new double[number_of_fuelbreaks]; 	// parameter for D1 variable
 			d2 = new double[number_of_fuelbreaks]; 	// parameter for D2 variable
@@ -147,7 +150,7 @@ public class example_data_processing {
 				}
 			}
 			
-			// Note add POD ID in the file - 1 so all PODs starts from 0
+			// Note add POD ID in the file - 1 so all PODs starts from 0, also FuelBreakIDs in the file - 1 so all breaks starts from 0
 			// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e
 			b_list = new ArrayList[number_of_fires][][];
 			for (int e = 0; e < number_of_fires; e++) {	
@@ -207,6 +210,10 @@ public class example_data_processing {
 		return number_of_fires;
 	}
 	
+	public int[] get_original_fire_id() {
+		return original_fire_id;
+	}
+
 	public int[] get_number_of_PODS() {
 		return number_of_PODS;
 	}

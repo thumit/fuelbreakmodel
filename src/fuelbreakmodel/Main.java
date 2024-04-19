@@ -41,23 +41,24 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				// For the illustrated example with 4 fires
+				// For the illustrated example from Wei with 4 fires
 				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 13/fuelbreak1.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 13/fuelbreak2.txt");
-				File input_3_file = new File(input_folder + "/model_inputs/Manuscript 13/fuelbreak3.txt");
-				File input_4_file = new File(input_folder + "/model_inputs/Manuscript 13/fuelbreak4.txt");
+				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 13/input_1.txt");
+				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 13/input_2.txt");
+				File input_3_file = new File(input_folder + "/model_inputs/Manuscript 13/input_3.txt");
+				File input_4_file = new File(input_folder + "/model_inputs/Manuscript 13/input_4.txt");
 				File problem_file = new File(input_folder + "/model_outputs/Manuscript 13/problem.lp");
 				File solution_file = new File(input_folder + "/model_outputs/Manuscript 13/solution.sol");
-				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 13/output_01_variables.txt");				
-				double budget = 10;
+				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 13/output_1_variables.txt");				
+				double budget = 30;
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
 				example_data_processing data_processing = new example_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
-				int number_of_fires = data_processing.get_number_of_fires();	// number of fires
-				int[] number_of_PODS = data_processing.get_number_of_PODS(); 	// number of dynamic PODs for each fire
-				int[] n = data_processing.get_n(); 								// number of dynamic PODs for each fire minus one
-				int[] ignition_POD = data_processing.get_ignition_POD(); 		// the ignition POD of each fire (always 1 as it is result of running the python script)
+				int number_of_fires = data_processing.get_number_of_fires();		// number of fires
+				int[] original_fire_id = data_processing.get_original_fire_id(); 	// store the original fire_id: which is "fire_id" in the input_01_file of the example, or "FIRE_NUMBE" in the great basin attribute table
+				int[] number_of_PODS = data_processing.get_number_of_PODS(); 		// number of dynamic PODs for each fire
+				int[] n = data_processing.get_n(); 									// number of dynamic PODs for each fire minus one
+				int[] ignition_POD = data_processing.get_ignition_POD(); 			// the ignition POD of each fire (always 1 as it is result of running the python script)
 															
 				double[][] ENVC = data_processing.get_ENVC();								// w(e,ie) or ENVC in the objective function, with e is the FireID, i is the dynamic POD				
 				List<Integer>[][] adjacent_PODS = data_processing.get_adjacent_PODS();		// Adjacent PODs
@@ -89,7 +90,7 @@ public class Main {
 				for (int e = 0; e < number_of_fires; e++) {
 					X[e] = new int[number_of_PODS[e]];
 					for (int i = 0; i < number_of_PODS[e]; i++) {
-						int fire_ID = e + 1;
+						int fire_ID = original_fire_id[e];
 						int POD_ID = i + 1;
 						String var_name = "X_" + fire_ID + "_" + POD_ID;
 						Information_Variable var_info = new Information_Variable(var_name);
@@ -172,7 +173,7 @@ public class Main {
 						Y[e][i] = new int[number_of_PODS[e]];
 						for (int j = i + 1; j < number_of_PODS[e]; j++) {
 							if (adjacent_PODS[e][i].contains(j)) {
-								int fire_ID = e + 1;
+								int fire_ID = original_fire_id[e];
 								int dynamic_POD_i = i + 1;
 								int dynamic_POD_j = j + 1;
 								String var_name = "Y_" + fire_ID + "_" + dynamic_POD_i + "_" + dynamic_POD_j;
@@ -198,7 +199,7 @@ public class Main {
 						B[e][i] = new int[number_of_PODS[e]];
 						for (int j = 0; j < number_of_PODS[e]; j++) {
 							if (adjacent_PODS[e][i].contains(j)) {
-								int fire_ID = e + 1;
+								int fire_ID = original_fire_id[e];
 								int dynamic_POD_i = i + 1;
 								int dynamic_POD_j = j + 1;
 								String var_name = "B_" + fire_ID + "_" + dynamic_POD_i + "_" + dynamic_POD_j;
@@ -221,7 +222,7 @@ public class Main {
 				for (int e = 0; e < number_of_fires; e++) {
 					F[e] = new int[number_of_PODS[e]];
 					for (int i = 0; i < number_of_PODS[e]; i++) {
-						int fire_ID = e + 1;
+						int fire_ID = original_fire_id[e];
 						int POD_ID = i + 1;
 						String var_name = "F_" + fire_ID + "_" + POD_ID;
 						Information_Variable var_info = new Information_Variable(var_name);
