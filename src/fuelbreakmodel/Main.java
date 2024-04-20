@@ -44,7 +44,7 @@ public class Main {
 				double budget;
 				
 //				budget = 30;
-//				// For the illustrated example from Wei with 4 fires
+//				// For the illustrated example from Wei with 4 fires - 4 inputs needed
 //				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
 //				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_1.txt");
 //				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_2.txt");
@@ -55,14 +55,24 @@ public class Main {
 //				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/output_1_variables.txt");
 //				Example_4_inputs_data_processing data_processing = new Example_4_inputs_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
 				
+//				budget = 30;
+//				// For the illustrated example from Wei with 4 fires - 2 inputs needed
+//				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
+//				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_1.txt");
+//				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_2.txt");
+//				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/problem.lp");
+//				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/solution.sol");
+//				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/output_1_variables.txt");
+//				Example_2_inputs_data_processing data_processing = new Example_2_inputs_data_processing(input_1_file, input_2_file);
+				
 				budget = 30;
-				// For the Great Basin data
+				// For the Great Basin data - 2 inputs needed
 				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_1.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_2.txt");
-				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/problem.lp");
-				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/solution.sol");
-				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/output_1_variables.txt");
+				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/greatbasin/GB_attribute_table_final.txt");
+				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/greatbasin/GB_fuel_break_costs.txt");
+				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/greatbasin/problem.lp");
+				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/greatbasin/solution.sol");
+				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/greatbasin/output_1_variables.txt");
 				Example_2_inputs_data_processing data_processing = new Example_2_inputs_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
