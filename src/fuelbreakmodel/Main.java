@@ -40,20 +40,43 @@ public class Main {
 	public Main() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
-			public void run() {
-				// For the illustrated example from Wei with 4 fires
+			public void run() {				
+				double budget;
+				
+				boolean run_example = true;	// false means we will run the actual Great Basin model
+//				Object data_processing;
+//				
+//				if (run_example) {
+//					budget = 30;
+//					// For the illustrated example from Wei with 4 fires
+//					String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
+//					File input_1_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_1.txt");
+//					File input_2_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_2.txt");
+//					File input_3_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_3.txt");
+//					File input_4_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_4.txt");
+//					File problem_file = new File(input_folder + "/model_outputs/Manuscript 14/example/problem.lp");
+//					File solution_file = new File(input_folder + "/model_outputs/Manuscript 14/example/solution.sol");
+//					File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 14/example/output_1_variables.txt");
+//					Example_data_processing data_processing = new Example_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
+//				} else {
+//					budget = 30;
+//					// For the Great Basin data
+//					String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
+//					File input_1_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_1.txt");
+//					data_processing = new GreatBasin_data_processing(input_1_file);
+//				}
+				
+				budget = 10;
+				// For the Great Basin data
 				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 13/input_1.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 13/input_2.txt");
-				File input_3_file = new File(input_folder + "/model_inputs/Manuscript 13/input_3.txt");
-				File input_4_file = new File(input_folder + "/model_inputs/Manuscript 13/input_4.txt");
-				File problem_file = new File(input_folder + "/model_outputs/Manuscript 13/problem.lp");
-				File solution_file = new File(input_folder + "/model_outputs/Manuscript 13/solution.sol");
-				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 13/output_1_variables.txt");				
-				double budget = 30;
+				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 14/greatbasin/input_1.txt");
+				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 14/greatbasin/input_2.txt");
+				File problem_file = new File(input_folder + "/model_outputs/Manuscript 14/greatbasin/problem.lp");
+				File solution_file = new File(input_folder + "/model_outputs/Manuscript 14/greatbasin/solution.sol");
+				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 14/greatbasin/output_1_variables.txt");
+				GreatBasin_data_processing data_processing = new GreatBasin_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
-				example_data_processing data_processing = new example_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
 				int number_of_fires = data_processing.get_number_of_fires();		// number of fires
 				int[] original_fire_id = data_processing.get_original_fire_id(); 	// store the original fire_id: which is "fire_id" in the input_01_file of the example, or "FIRE_NUMBE" in the great basin attribute table
 				int[] number_of_PODS = data_processing.get_number_of_PODS(); 		// number of dynamic PODs for each fire
@@ -67,7 +90,7 @@ public class Main {
 				double[] q0 = data_processing.get_q0();		// the current capacity of a fuel break
 				double[] d1 = data_processing.get_d1(); 	// parameter for D1 variable
 				double[] d2 = data_processing.get_d2();		// parameter for D2 variable
-				double[] d3 = data_processing.get_d3(); 	// parameter for D3 variabl
+				double[] d3 = data_processing.get_d3(); 	// parameter for D3 variable
 
 				List<Integer>[][][] b_list = data_processing.get_b_list();		// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e
 				List<Double>[][][] fl_list = data_processing.get_fl_list();		// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e
@@ -313,7 +336,7 @@ public class Main {
 				c2_valuelist = null;
 				c2_lblist = null;	
 				c2_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (2):   " + c2_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (2):   " + c2_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 3------------------------------------------------------
@@ -361,7 +384,7 @@ public class Main {
 				c3_valuelist = null;
 				c3_lblist = null;	
 				c3_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (3):   " + c3_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (3):   " + c3_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 4------------------------------------------------------		
@@ -414,7 +437,7 @@ public class Main {
 				c4_valuelist = null;
 				c4_lblist = null;	
 				c4_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (4):   " + c4_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (4):   " + c4_num + "             " + dateFormat.format(new Date()));
 				
 									
 				// Constraints 5------------------------------------------------------		
@@ -466,7 +489,7 @@ public class Main {
 				c5_valuelist = null;
 				c5_lblist = null;	
 				c5_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (5):   " + c5_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (5):   " + c5_num + "             " + dateFormat.format(new Date()));
 					
 				
 				// Constraints 6------------------------------------------------------
@@ -555,7 +578,7 @@ public class Main {
 				c6_valuelist = null;
 				c6_lblist = null;	
 				c6_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (6):   " + c6_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (6):   " + c6_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 7------------------------------------------------------		
@@ -630,7 +653,7 @@ public class Main {
 				c7_valuelist = null;
 				c7_lblist = null;	
 				c7_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (7):   " + c7_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (7):   " + c7_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 8------------------------------------------------------		
@@ -678,7 +701,7 @@ public class Main {
 				c8_valuelist = null;
 				c8_lblist = null;	
 				c8_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (8):   " + c8_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (8):   " + c8_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 9------------------------------------------------------		
@@ -788,7 +811,7 @@ public class Main {
 				c9_valuelist = null;
 				c9_lblist = null;	
 				c9_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (9):   " + c9_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (9):   " + c9_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 10------------------------------------------------------		
@@ -845,7 +868,7 @@ public class Main {
 				c10_valuelist = null;
 				c10_lblist = null;	
 				c10_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (10):   " + c10_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (10):   " + c10_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 11------------------------------------------------------		
@@ -898,7 +921,7 @@ public class Main {
 				c11_valuelist = null;
 				c11_lblist = null;	
 				c11_ublist = null;
-				System.out.println("Total constraints as in PRISM model formulation eq. (11):   " + c11_num + "             " + dateFormat.format(new Date()));
+				System.out.println("Total constraints as in model formulation eq. (11):   " + c11_num + "             " + dateFormat.format(new Date()));
 				time_end = System.currentTimeMillis();		// measure time after reading
 				time_reading = (double) (time_end - time_start) / 1000;
 				

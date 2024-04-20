@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class example_data_processing {
+public class Example_data_processing {
 	private int number_of_fires;	// number of fires
 	private int[] original_fire_id; // the original fire_id: which is "fire_id" in the input_01_file of the example, or "FIRE_NUMBE" in the great basin attribute table
 	private int[] number_of_PODS; 	// number of dynamic PODs for each fire
@@ -27,7 +27,7 @@ public class example_data_processing {
 	private List<Integer>[][][] b_list;	// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e										
 	private List<Double>[][][] fl_list;	// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e		
 
-	public example_data_processing(File input_1_file, File input_2_file, File input_3_file, File input_4_file) {
+	public Example_data_processing(File input_1_file, File input_2_file, File input_3_file, File input_4_file) {
 		try {
 			// Read input1 --------------------------------------------------------------------------------------------
 			List<String> list = Files.readAllLines(Paths.get(input_1_file.getAbsolutePath()), StandardCharsets.UTF_8);
