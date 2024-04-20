@@ -43,38 +43,27 @@ public class Main {
 			public void run() {				
 				double budget;
 				
-				boolean run_example = true;	// false means we will run the actual Great Basin model
-//				Object data_processing;
-//				
-//				if (run_example) {
-//					budget = 30;
-//					// For the illustrated example from Wei with 4 fires
-//					String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-//					File input_1_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_1.txt");
-//					File input_2_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_2.txt");
-//					File input_3_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_3.txt");
-//					File input_4_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_4.txt");
-//					File problem_file = new File(input_folder + "/model_outputs/Manuscript 14/example/problem.lp");
-//					File solution_file = new File(input_folder + "/model_outputs/Manuscript 14/example/solution.sol");
-//					File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 14/example/output_1_variables.txt");
-//					Example_data_processing data_processing = new Example_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
-//				} else {
-//					budget = 30;
-//					// For the Great Basin data
-//					String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-//					File input_1_file = new File(input_folder + "/model_inputs/Manuscript 14/example/input_1.txt");
-//					data_processing = new GreatBasin_data_processing(input_1_file);
-//				}
+//				budget = 30;
+//				// For the illustrated example from Wei with 4 fires
+//				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
+//				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_1.txt");
+//				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_2.txt");
+//				File input_3_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_3.txt");
+//				File input_4_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_4.txt");
+//				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/problem.lp");
+//				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/solution.sol");
+//				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/output_1_variables.txt");
+//				Example_4_inputs_data_processing data_processing = new Example_4_inputs_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
 				
-				budget = 10;
+				budget = 30;
 				// For the Great Basin data
 				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 14/greatbasin/input_1.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 14/greatbasin/input_2.txt");
-				File problem_file = new File(input_folder + "/model_outputs/Manuscript 14/greatbasin/problem.lp");
-				File solution_file = new File(input_folder + "/model_outputs/Manuscript 14/greatbasin/solution.sol");
-				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 14/greatbasin/output_1_variables.txt");
-				GreatBasin_data_processing data_processing = new GreatBasin_data_processing(input_1_file, input_2_file);
+				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_1.txt");
+				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_2.txt");
+				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/problem.lp");
+				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/solution.sol");
+				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/output_1_variables.txt");
+				Example_2_inputs_data_processing data_processing = new Example_2_inputs_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
 				int number_of_fires = data_processing.get_number_of_fires();		// number of fires
