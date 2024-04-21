@@ -54,7 +54,7 @@ public class GreatBasin_2_inputs_data_processing {
 			number_of_fires = 0;
 			for (int i = 0; i < total_rows; i++) {
 				int origin_id = Integer.parseInt(data[i][0]);				// 'FIRENUMBE' column
-				int num_pods = Integer.parseInt(data[i][9]);				// 'num_polys' column
+				int num_pods = Integer.parseInt(data[i][15]);				// 'num_polys' column
 				if (!original_fire_id_list.contains(origin_id)) {
 					original_fire_id_list.add(origin_id);
 					num_of_PODS_list.add(num_pods);
@@ -76,7 +76,7 @@ public class GreatBasin_2_inputs_data_processing {
 			for (int e = 0; e < number_of_fires; e++) {
 				ENVC[e] = new double[number_of_PODS[e]];
 				for (int i = 0; i < number_of_PODS[e]; i++) {
-					ENVC[e][i] = Double.parseDouble(data[row_index][4]);	// 'poly_core' column (currently we only consider net loss of core areas)
+					ENVC[e][i] = Double.parseDouble(data[row_index][9]);	// 'poly_core' column (currently we only consider net loss of core areas)
 					row_index++;
 				}
 			}
@@ -88,10 +88,12 @@ public class GreatBasin_2_inputs_data_processing {
 				adjacent_PODS[e] = new ArrayList[number_of_PODS[e]];
 				for (int i = 0; i < number_of_PODS[e]; i++) {
 					adjacent_PODS[e][i] = new ArrayList<Integer>();
-					String[] AdjPODs = data[row_index][5].split(",");		// 'adj_polys' column
+					String[] AdjPODs = data[row_index][10].split(",");		// 'adj_polys' column
 					for (String s : AdjPODs) {
-						int pod_id = Integer.parseInt(s) - 1;	// because in the model poly index starts from 0
-						adjacent_PODS[e][i].add(pod_id);
+						if (!s.equals("")) {		// NOTE NOTE NOTE NOTE NOTE NOTE: This is not in the class Example_2_inputs_data_processing because the example is perfect. In reality, a fire may not be split by breaks, therefore having no adjacent polygons.
+							int pod_id = Integer.parseInt(s) - 1;	// because in the model poly index starts from 0
+							adjacent_PODS[e][i].add(pod_id);
+						}
 					}
 					row_index++;
 				}
@@ -113,8 +115,8 @@ public class GreatBasin_2_inputs_data_processing {
 			row_index = 0;
 			for (int e = 0; e < number_of_fires; e++) {
 				for (int i = 0; i < number_of_PODS[e]; i++) {					// loop all poly i (the first poly of the adjacent pair). If reading from "poly_id" column then we need to minus 1.
-					String[] sim_polys = data[row_index][6].split(",");			// 'sim_polys' column
-					String[] origin_break_ids = data[row_index][7].split(",");	// 'break_ids' column
+					String[] sim_polys = data[row_index][11].split(",");		// 'sim_polys' column
+					String[] origin_break_ids = data[row_index][12].split(",");	// 'break_ids' column
 					if (!sim_polys[0].equals("")) {								// means the "poly_id" has at least one adjacent poly. Note that sim_polys column only list poly j of the pair (i,j) where j > i to avoid double counting
 						for (int k = 0; k < sim_polys.length; k++) {			// loop all poly j (the second poly of the adjacent pair, j > i automatically in the input)
 							int j =  Integer.parseInt(sim_polys[k]) - 1;		// because in the model poly index starts from 0 so we need to minus 1 here
@@ -147,8 +149,8 @@ public class GreatBasin_2_inputs_data_processing {
 			row_index = 0;
 			for (int e = 0; e < number_of_fires; e++) {
 				for (int i = 0; i < number_of_PODS[e]; i++) {					// loop all poly i (the first poly of the adjacent pair). If reading from "poly_id" column then we need to minus 1.
-					String[] sim_polys = data[row_index][6].split(",");			// 'sim_polys' column
-					String[] max_flame_lengths = data[row_index][8].split(",");	// 'max_fl' column
+					String[] sim_polys = data[row_index][11].split(",");		// 'sim_polys' column
+					String[] max_flame_lengths = data[row_index][13].split(",");// 'max_fl' column
 					if (!sim_polys[0].equals("")) {								// means the "poly_id" has at least one adjacent poly. Note that sim_polys column only list poly j of the pair (i,j) where j > i to avoid double counting
 						for (int k = 0; k < sim_polys.length; k++) {			// loop all poly j (the second poly of the adjacent pair, j > i automatically in the input)
 							int j =  Integer.parseInt(sim_polys[k]) - 1;		// because in the model poly index starts from 0 so we need to minus 1 here
@@ -187,10 +189,10 @@ public class GreatBasin_2_inputs_data_processing {
 			d2 = new double[number_of_fuelbreaks]; 	// parameter for D2 variable
 			d3 = new double[number_of_fuelbreaks]; 	// parameter for D3 variable
 			for (int b = 0; b < number_of_fuelbreaks; b++) {
-				q0[b] = Double.parseDouble(data[b][1]);
-				d1[b] = Double.parseDouble(data[b][2]);
-				d2[b] = Double.parseDouble(data[b][3]);
-				d3[b] = Double.parseDouble(data[b][4]);
+				q0[b] = Double.parseDouble(data[b][7]);
+				d1[b] = Double.parseDouble(data[b][8]);
+				d2[b] = Double.parseDouble(data[b][9]);
+				d3[b] = Double.parseDouble(data[b][10]);
 			}					
 			
 		

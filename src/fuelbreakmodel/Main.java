@@ -65,15 +65,15 @@ public class Main {
 //				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/output_1_variables.txt");
 //				Example_2_inputs_data_processing data_processing = new Example_2_inputs_data_processing(input_1_file, input_2_file);
 				
-				budget = 30;
+				budget = 3000;
 				// For the Great Basin data - 2 inputs needed
 				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/greatbasin/GB_attribute_table_final.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/greatbasin/GB_fuel_break_costs.txt");
+				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/greatbasin/GB_attribute_table_final_trim.txt");
+				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/greatbasin/GB_fuel_breaks_with_costs.txt");
 				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/greatbasin/problem.lp");
 				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/greatbasin/solution.sol");
 				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/greatbasin/output_1_variables.txt");
-				Example_2_inputs_data_processing data_processing = new Example_2_inputs_data_processing(input_1_file, input_2_file);
+				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
 				int number_of_fires = data_processing.get_number_of_fires();		// number of fires
@@ -1015,7 +1015,7 @@ public class Main {
 						double[] value = cplex.getValues(lp);
 						// double[] reduceCost = cplex.getReducedCosts(lp);
 						// double[] dual = cplex.getDuals(lp);
-						double[] slack = cplex.getSlacks(lp);
+						// double[] slack = cplex.getSlacks(lp);
 						double objective_value = cplex.getObjValue();
 						Status cplex_status = cplex.getStatus();
 						int cplex_algorithm = cplex.getAlgorithm();
@@ -1029,13 +1029,13 @@ public class Main {
 						// output_01_variables
 						output_variables_file.delete();
 						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_variables_file))) {
-							String file_header = String.join("\t", "var_id", "var_name", "var_value", "var_slack");
+							String file_header = String.join("\t", "var_id", "var_name", "var_value");
 							fileOut.write(file_header);
 							
 							for (int i = 0; i < value.length; i++) {
 								if (value[i] != 0) {	// only write variable that is not zero
 									fileOut.newLine();
-									fileOut.write(i + "\t" + vname[i] + "\t" + value[i] + "\t" + slack[i]);
+									fileOut.write(i + "\t" + vname[i] + "\t" + value[i]);
 								}
 							}
 							fileOut.close();
