@@ -20,10 +20,9 @@ public class GreatBasin_2_inputs_data_processing {
 	private List<Integer>[][] adjacent_PODS;	// Adjacent PODs
 					
 	private int number_of_fuelbreaks;
-	private double[] q0; 	// the current capacity of a fuel break
-	private double[] d1; 	// parameter for D1 variable
-	private double[] d2; 	// parameter for D2 variable
-	private double[] d3; 	// parameter for D3 variable										
+	private int number_of_management_options;
+	private double[][] q; 	// flame length capacity of a fuel break when a management option k is implemented 
+	private double[][] c; 	// cost of a fuel break when a management option k is implemented 										
 	
 	private List<Integer>[][][] b_list;	// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e										
 	private List<Double>[][][] fl_list;	// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e		
@@ -100,7 +99,7 @@ public class GreatBasin_2_inputs_data_processing {
 			}
 			
 
-			// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e
+			// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e. Note that we use split with -1 to include empty string in the result
 			b_list = new ArrayList[number_of_fires][][];
 			for (int e = 0; e < number_of_fires; e++) {	
 				b_list[e] = new ArrayList[number_of_PODS[e] - 1][];
@@ -116,16 +115,22 @@ public class GreatBasin_2_inputs_data_processing {
 			for (int e = 0; e < number_of_fires; e++) {
 				for (int i = 0; i < number_of_PODS[e]; i++) {					// loop all poly i (the first poly of the adjacent pair). If reading from "poly_id" column then we need to minus 1.
 					String[] sim_polys = data[row_index][11].split(",");		// 'sim_polys' column
-					String[] origin_break_ids = data[row_index][12].split(",");	// 'break_ids' column
-					if (!sim_polys[0].equals("")) {								// means the "poly_id" has at least one adjacent poly. Note that sim_polys column only list poly j of the pair (i,j) where j > i to avoid double counting
+					String[] origin_break_ids = data[row_index][12].split(",", -1);	// 'break_ids' column
+					if (!(sim_polys[0].equals("") && sim_polys.length == 1)) {	// means the "poly_id" has at least one adjacent poly. Note that sim_polys column only list poly j of the pair (i,j) where j > i to avoid double counting
 						for (int k = 0; k < sim_polys.length; k++) {			// loop all poly j (the second poly of the adjacent pair, j > i automatically in the input)
 							int j =  Integer.parseInt(sim_polys[k]) - 1;		// because in the model poly index starts from 0 so we need to minus 1 here
 							// we now have a pair of polygon (i,j). In their shared bound there may be multiple fuel breaks, get them all:
-							String[] original_break_ids_within_pods_bound = origin_break_ids[k].split(" ");		// all breaks are separated by space as how we create the input
+							String[] original_break_ids_within_pods_bound = origin_break_ids[k].split(" ", -1);		// all breaks are separated by space as how we create the input
 							// Add all these breaks into the list
 							for (String s : original_break_ids_within_pods_bound) {
-								int break_id = Integer.parseInt(s) - 1;
-								b_list[e][i][j].add(break_id);
+								// if the 2 polygon share a vertex (a point) then this is "" in the input.
+								// We use a dirty trick to add the first break (although it is not true) and add -9999 as flame length to not allow fire spreading through
+								if (s.equals("")) {		
+									b_list[e][i][j].add((int) 0);
+								} else {
+									int break_id = Integer.parseInt(s) - 1;
+									b_list[e][i][j].add(break_id);
+								}
 							}
 						}
 					}
@@ -133,7 +138,7 @@ public class GreatBasin_2_inputs_data_processing {
 				}
 			}
 					
-			// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e (similar  to the above code)
+			// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e. Note that we use split with -1 to include empty string in the result (similar  to the above code)
 			fl_list = new ArrayList[number_of_fires][][];
 			for (int e = 0; e < number_of_fires; e++) {	
 				fl_list[e] = new ArrayList[number_of_PODS[e] - 1][];
@@ -150,16 +155,21 @@ public class GreatBasin_2_inputs_data_processing {
 			for (int e = 0; e < number_of_fires; e++) {
 				for (int i = 0; i < number_of_PODS[e]; i++) {					// loop all poly i (the first poly of the adjacent pair). If reading from "poly_id" column then we need to minus 1.
 					String[] sim_polys = data[row_index][11].split(",");		// 'sim_polys' column
-					String[] max_flame_lengths = data[row_index][13].split(",");// 'max_fl' column
-					if (!sim_polys[0].equals("")) {								// means the "poly_id" has at least one adjacent poly. Note that sim_polys column only list poly j of the pair (i,j) where j > i to avoid double counting
+					String[] max_flame_lengths = data[row_index][13].split(",", -1);// 'max_fl' column
+					if (!(sim_polys[0].equals("") && sim_polys.length == 1)) {	// means the "poly_id" has at least one adjacent poly. Note that sim_polys column only list poly j of the pair (i,j) where j > i to avoid double counting
 						for (int k = 0; k < sim_polys.length; k++) {			// loop all poly j (the second poly of the adjacent pair, j > i automatically in the input)
 							int j =  Integer.parseInt(sim_polys[k]) - 1;		// because in the model poly index starts from 0 so we need to minus 1 here
 							// we now have a pair of polygon (i,j). In their shared bound there may be multiple fuel breaks (each break segment has a max flame length), get them all:
-							String[] breaks_max_fls = max_flame_lengths[k].split(" ");		// all flame lengths are separated by space as how we create the input
+							String[] breaks_max_fls = max_flame_lengths[k].split(" ", -1);		// all flame lengths are separated by space as how we create the input
 							// Add all these breaks into the list
 							for (String s : breaks_max_fls) {
-								double val = Double.parseDouble(s);
-								fl_list[e][i][j].add(val);
+								// if the 2 polygon share a vertex (a point) then this is "" in the input.
+								// We use a dirty trick to add the first break (although it is not true) and add -9999 as flame length to not allow fire spreading through
+								if (s.equals("")) {		
+									fl_list[e][i][j].add((double) -9999);
+								} else {
+									fl_list[e][i][j].add(Double.parseDouble(s));
+								}
 							}
 						}
 					}
@@ -184,16 +194,25 @@ public class GreatBasin_2_inputs_data_processing {
 			}
 			
 			number_of_fuelbreaks = total_rows;
-			q0 = new double[number_of_fuelbreaks]; 	// the current capacity of a fuel break
-			d1 = new double[number_of_fuelbreaks]; 	// parameter for D1 variable
-			d2 = new double[number_of_fuelbreaks]; 	// parameter for D2 variable
-			d3 = new double[number_of_fuelbreaks]; 	// parameter for D3 variable
+			number_of_management_options = 5;
+			q = new double[number_of_fuelbreaks][]; 	// capacity of a fuel break when a management option k is implemented 
+			c = new double[number_of_fuelbreaks][]; 	// cost of a fuel break when a management option k is implemented 
 			for (int b = 0; b < number_of_fuelbreaks; b++) {
-				q0[b] = Double.parseDouble(data[b][7]);
-				d1[b] = Double.parseDouble(data[b][8]);
-				d2[b] = Double.parseDouble(data[b][9]);
-				d3[b] = Double.parseDouble(data[b][10]);
-			}					
+				q[b] = new double[5];		// 5 options k = 0, 1, 2, 3, 4 associated with break width 0, 100, 200, 300, 400 Feet
+				c[b] = new double[5];		// 5 options k = 0, 1, 2, 3, 4 associated with break width 0, 100, 200, 300, 400 Feet
+				
+				c[b][0] = Double.parseDouble(data[b][11]);
+				c[b][1] = Double.parseDouble(data[b][12]);
+				c[b][2] = Double.parseDouble(data[b][13]);
+				c[b][3] = Double.parseDouble(data[b][14]);
+				c[b][4] = Double.parseDouble(data[b][15]);
+				
+				q[b][0] = Double.parseDouble(data[b][16]);
+				q[b][1] = Double.parseDouble(data[b][17]);
+				q[b][2] = Double.parseDouble(data[b][18]);
+				q[b][3] = Double.parseDouble(data[b][19]);
+				q[b][4] = Double.parseDouble(data[b][20]);
+			}	
 			
 		
 		
@@ -235,20 +254,16 @@ public class GreatBasin_2_inputs_data_processing {
 		return number_of_fuelbreaks;
 	}
 	
-	public double[] get_q0() {
-		return q0;
+	public int get_number_of_management_options() {
+		return number_of_management_options;
 	}
 	
-	public double[] get_d1() {
-		return d1;
+	public double[][] get_q() {
+		return q;
 	}
 	
-	public double[] get_d2() {
-		return d2;
-	}
-	
-	public double[] get_d3() {
-		return d3;
+	public double[][] get_c() {
+		return c;
 	}
 	
 	public List<Integer>[][][] get_b_list() {
