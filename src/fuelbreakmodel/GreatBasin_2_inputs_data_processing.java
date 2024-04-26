@@ -20,9 +20,10 @@ public class GreatBasin_2_inputs_data_processing {
 	private List<Integer>[][] adjacent_PODS;	// Adjacent PODs
 					
 	private int number_of_fuelbreaks;
-	private int number_of_management_options;
-	private double[][] q; 	// flame length capacity of a fuel break when a management option k is implemented 
-	private double[][] c; 	// cost of a fuel break when a management option k is implemented 										
+	private double[] q0; 	// the current capacity of a fuel break
+	private double[] d1; 	// parameter for D1 variable
+	private double[] d2; 	// parameter for D2 variable
+	private double[] d3; 	// parameter for D3 variable										
 	
 	private List<Integer>[][][] b_list;	// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e										
 	private List<Double>[][][] fl_list;	// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e		
@@ -194,25 +195,16 @@ public class GreatBasin_2_inputs_data_processing {
 			}
 			
 			number_of_fuelbreaks = total_rows;
-			number_of_management_options = 5;
-			q = new double[number_of_fuelbreaks][]; 	// capacity of a fuel break when a management option k is implemented 
-			c = new double[number_of_fuelbreaks][]; 	// cost of a fuel break when a management option k is implemented 
+			q0 = new double[number_of_fuelbreaks]; 	// the current capacity of a fuel break
+			d1 = new double[number_of_fuelbreaks]; 	// parameter for D1 variable
+			d2 = new double[number_of_fuelbreaks]; 	// parameter for D2 variable
+			d3 = new double[number_of_fuelbreaks]; 	// parameter for D3 variable
 			for (int b = 0; b < number_of_fuelbreaks; b++) {
-				q[b] = new double[5];		// 5 options k = 0, 1, 2, 3, 4 associated with break width 0, 100, 200, 300, 400 Feet
-				c[b] = new double[5];		// 5 options k = 0, 1, 2, 3, 4 associated with break width 0, 100, 200, 300, 400 Feet
-				
-				c[b][0] = Double.parseDouble(data[b][11]);
-				c[b][1] = Double.parseDouble(data[b][12]);
-				c[b][2] = Double.parseDouble(data[b][13]);
-				c[b][3] = Double.parseDouble(data[b][14]);
-				c[b][4] = Double.parseDouble(data[b][15]);
-				
-				q[b][0] = Double.parseDouble(data[b][16]);
-				q[b][1] = Double.parseDouble(data[b][17]);
-				q[b][2] = Double.parseDouble(data[b][18]);
-				q[b][3] = Double.parseDouble(data[b][19]);
-				q[b][4] = Double.parseDouble(data[b][20]);
-			}	
+				q0[b] = Double.parseDouble(data[b][7]);
+				d1[b] = Double.parseDouble(data[b][8]);
+				d2[b] = Double.parseDouble(data[b][9]);
+				d3[b] = Double.parseDouble(data[b][10]);
+			}					
 			
 		
 		
@@ -254,16 +246,20 @@ public class GreatBasin_2_inputs_data_processing {
 		return number_of_fuelbreaks;
 	}
 	
-	public int get_number_of_management_options() {
-		return number_of_management_options;
+	public double[] get_q0() {
+		return q0;
 	}
 	
-	public double[][] get_q() {
-		return q;
+	public double[] get_d1() {
+		return d1;
 	}
 	
-	public double[][] get_c() {
-		return c;
+	public double[] get_d2() {
+		return d2;
+	}
+	
+	public double[] get_d3() {
+		return d3;
 	}
 	
 	public List<Integer>[][][] get_b_list() {
