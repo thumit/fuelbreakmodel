@@ -16,11 +16,12 @@ public class GreatBasin_2_inputs_data_processing {
 	private int[] n; 				// number of dynamic PODs for each fire minus one
 	private int[] ignition_POD; 	// the ignition POD of each fire
 												
-	private double[][] ENVC;					// w(e,ie) in the objective function, with e is the FireID, i is the dynamic POD			
+	private double[][] core_areas;					// w(e,ie) in the objective function, with e is the FireID, i is the dynamic POD			
 	private List<Integer>[][] adjacent_PODS;	// Adjacent PODs
 					
 	private int number_of_fuelbreaks;
 	private int number_of_management_options;
+	private double[] q_0; 	// flame length capacity of a fuel break when no investment is made for that break
 	private double[][] q; 	// flame length capacity of a fuel break when a management option k is implemented 
 	private double[][] c; 	// cost of a fuel break when a management option k is implemented 										
 	
@@ -69,13 +70,13 @@ public class GreatBasin_2_inputs_data_processing {
 				ignition_POD[e] = 1 - 1;	// poly_id = 1 is always the Ignition pod in the attribute table. Ignition pod 1 will be indexed as 0 in the model. That is why we use 0 instead of 1 here.		
 			}
 			
-			// ENVC parameter or w(e,ie) in the objective function: e is the new fire_id, i is the dynamic POD
-			ENVC = new double[number_of_fires][];
+			// w(e,ie) in the objective function: e is the new fire_id, i is the dynamic POD
+			core_areas = new double[number_of_fires][];
 			int row_index = 0;
 			for (int e = 0; e < number_of_fires; e++) {
-				ENVC[e] = new double[number_of_PODS[e]];
+				core_areas[e] = new double[number_of_PODS[e]];
 				for (int i = 0; i < number_of_PODS[e]; i++) {
-					ENVC[e][i] = Double.parseDouble(data[row_index][9]);	// 'poly_core' column (currently we only consider net loss of core areas)
+					core_areas[e][i] = Double.parseDouble(data[row_index][9]);	// 'poly_core' column (currently we only consider net loss of core areas)
 					row_index++;
 				}
 			}
@@ -194,24 +195,25 @@ public class GreatBasin_2_inputs_data_processing {
 			}
 			
 			number_of_fuelbreaks = total_rows;
-			number_of_management_options = 5;
+			number_of_management_options = 4;			// note k = 0, 1, 2, 3 in the model associated with k = 1, 2, 3, 4 in the manuscript_16_v4
+			q_0 = new double[number_of_fuelbreaks]; 	// current capacity of a fuel break when it is not invested in maintenance
 			q = new double[number_of_fuelbreaks][]; 	// capacity of a fuel break when a management option k is implemented 
 			c = new double[number_of_fuelbreaks][]; 	// cost of a fuel break when a management option k is implemented 
 			for (int b = 0; b < number_of_fuelbreaks; b++) {
-				q[b] = new double[5];		// 5 options k = 0, 1, 2, 3, 4 associated with break width 0, 100, 200, 300, 400 Feet
-				c[b] = new double[5];		// 5 options k = 0, 1, 2, 3, 4 associated with break width 0, 100, 200, 300, 400 Feet
+				q[b] = new double[number_of_management_options];		// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
+				c[b] = new double[number_of_management_options];		// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
 				
-				c[b][0] = Double.parseDouble(data[b][11]);
-				c[b][1] = Double.parseDouble(data[b][12]);
-				c[b][2] = Double.parseDouble(data[b][13]);
-				c[b][3] = Double.parseDouble(data[b][14]);
-				c[b][4] = Double.parseDouble(data[b][15]);
+				c[b][0] = Double.parseDouble(data[b][10]);
+				c[b][1] = Double.parseDouble(data[b][11]);
+				c[b][2] = Double.parseDouble(data[b][12]);
+				c[b][3] = Double.parseDouble(data[b][13]);
 				
-				q[b][0] = Double.parseDouble(data[b][16]);
-				q[b][1] = Double.parseDouble(data[b][17]);
-				q[b][2] = Double.parseDouble(data[b][18]);
-				q[b][3] = Double.parseDouble(data[b][19]);
-				q[b][4] = Double.parseDouble(data[b][20]);
+				q_0[b] = Double.parseDouble(data[b][14]);	// currently not use in our model, if we use it then we need another  do nothing k option and change equation 2a to use = instead of <=
+				
+				q[b][0] = Double.parseDouble(data[b][15]);
+				q[b][1] = Double.parseDouble(data[b][16]);
+				q[b][2] = Double.parseDouble(data[b][17]);
+				q[b][3] = Double.parseDouble(data[b][18]);
 			}	
 			
 		
@@ -242,8 +244,8 @@ public class GreatBasin_2_inputs_data_processing {
 		return ignition_POD;
 	}
 	
-	public double[][] get_ENVC() {
-		return ENVC;
+	public double[][] get_core_areas() {
+		return core_areas;
 	}
 	
 	public List<Integer>[][] get_adjacent_PODS() {
@@ -256,6 +258,10 @@ public class GreatBasin_2_inputs_data_processing {
 	
 	public int get_number_of_management_options() {
 		return number_of_management_options;
+	}
+	
+	public double[] get_q_0() {
+		return q_0;
 	}
 	
 	public double[][] get_q() {
