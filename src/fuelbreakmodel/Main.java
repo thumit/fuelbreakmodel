@@ -45,15 +45,18 @@ public class Main {
 				boolean export_solution_file = false;
 				double optimality_gap = 0;
 				double budget = 150000;
-				
+				String test_case_description = "alloptions";
 				
 				// For the Great Basin data - 2 inputs needed
-				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 17/GB_attribute_table_2_fires_example.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 17/GB_fuel_breaks_with_costs_v3.txt");
-				File problem_file = new File(input_folder + "/model_outputs/Manuscript 17/problem.lp");
-				File solution_file = new File(input_folder + "/model_outputs/Manuscript 17/solution.sol");
-				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 17/output_1_variables.txt");
+				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
+				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 17/GB_attribute_table_2_fires_example.txt");
+				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 17/GB_fuel_breaks_with_costs_v3.txt");
+				String output_folder = source_folder + "/model_outputs/Manuscript 17/" + (int) budget + "_" + test_case_description;
+				File outputFolderFile = new File(output_folder);
+				if (!outputFolderFile.exists()) outputFolderFile.mkdirs(); 	// Create output folder and its parents if they don't exist
+				File problem_file = new File(output_folder + "/problem.lp");
+				File solution_file = new File(output_folder + "/solution.sol");
+				File output_variables_file = new File(output_folder + "/output_1_variables.txt");
 				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
