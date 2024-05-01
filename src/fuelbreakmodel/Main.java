@@ -40,39 +40,18 @@ public class Main {
 	public Main() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
-			public void run() {				
-				double budget;
+			public void run() {
+				double optimality_gap = 0;
+				double budget = 150000;
 				
-//				budget = 30;
-//				// For the illustrated example from Wei with 4 fires - 4 inputs needed
-//				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-//				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_1.txt");
-//				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_2.txt");
-//				File input_3_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_3.txt");
-//				File input_4_file = new File(input_folder + "/model_inputs/Manuscript 15/example_4_inputs/input_4.txt");
-//				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/problem.lp");
-//				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/solution.sol");
-//				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_4_inputs/output_1_variables.txt");
-//				Example_4_inputs_data_processing data_processing = new Example_4_inputs_data_processing(input_1_file, input_2_file, input_3_file, input_4_file);
 				
-//				budget = 30;
-//				// For the illustrated example from Wei with 4 fires - 2 inputs needed
-//				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-//				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_1.txt");
-//				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 15/example_2_inputs/input_2.txt");
-//				File problem_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/problem.lp");
-//				File solution_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/solution.sol");
-//				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 15/example_2_inputs/output_1_variables.txt");
-//				Example_2_inputs_data_processing data_processing = new Example_2_inputs_data_processing(input_1_file, input_2_file);
-				
-				budget = 100000;
 				// For the Great Basin data - 2 inputs needed
 				String input_folder = get_workingLocation().replace("fuelbreakmodel", "");
-				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 16/greatbasin/GB_attribute_table_test.txt");
-				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 16/greatbasin/GB_fuel_breaks_with_costs_v3.txt");
-				File problem_file = new File(input_folder + "/model_outputs/Manuscript 16/greatbasin/problem.lp");
-				File solution_file = new File(input_folder + "/model_outputs/Manuscript 16/greatbasin/solution.sol");
-				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 16/greatbasin/output_1_variables.txt");
+				File input_1_file = new File(input_folder + "/model_inputs/Manuscript 17/GB_attribute_table_2_fires_example.txt");
+				File input_2_file = new File(input_folder + "/model_inputs/Manuscript 17/GB_fuel_breaks_with_costs_v3.txt");
+				File problem_file = new File(input_folder + "/model_outputs/Manuscript 17/problem.lp");
+				File solution_file = new File(input_folder + "/model_outputs/Manuscript 17/solution.sol");
+				File output_variables_file = new File(input_folder + "/model_outputs/Manuscript 17/output_1_variables.txt");
 				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
@@ -1000,7 +979,7 @@ public class Main {
 					objvals = null;		// Clear arrays to save memory
 //						cplex.setParam(IloCplex.Param.RootAlgorithm, IloCplex.Algorithm.Auto); // Auto choose optimization method
 					cplex.setParam(IloCplex.Param.MIP.Strategy.Search, IloCplex.MIPSearch.Traditional);	// MIP method
-					cplex.setParam(IloCplex.DoubleParam.EpGap, 0.005); // Optimality Gap
+					if (optimality_gap > 0) cplex.setParam(IloCplex.DoubleParam.EpGap, optimality_gap); // Optimality Gap
 //						int solvingTimeLimit = 30 * 60; //Get time Limit in minute * 60 = seconds
 //						cplex.setParam(IloCplex.DoubleParam.TimeLimit, solvingTimeLimit); // Set Time limit
 //						cplex.setParam(IloCplex.Param.MIP.Tolerances.Integrality, 0); 	// Set integrality tolerance: https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-integrality-tolerance;    https://www.ibm.com/support/pages/why-does-binary-or-integer-variable-take-noninteger-value-solution
@@ -1026,6 +1005,8 @@ public class Main {
 						// WRITE SOLUTION --------------------------------------------------------------
 						// WRITE SOLUTION --------------------------------------------------------------
 						// WRITE SOLUTION --------------------------------------------------------------
+						System.out.println("Objective function value = " + objective_value);
+						
 						// output_01_variables
 						output_variables_file.delete();
 						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_variables_file))) {
