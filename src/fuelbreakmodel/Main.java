@@ -41,6 +41,8 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				boolean export_problem_file = false;
+				boolean export_solution_file = false;
 				double optimality_gap = 0;
 				double budget = 150000;
 				
@@ -987,10 +989,9 @@ public class Main {
 //						cplex.setParam(IloCplex.Param.Preprocessing.Presolve, false);	// turn off presolve to prevent it from completely solving the model before entering the actual LP optimizer (same as above ???)
 					
 					time_start = System.currentTimeMillis();		// measure time before solving
-					cplex.exportModel(problem_file.getAbsolutePath());
 					if (cplex.solve()) {
-						cplex.exportModel(problem_file.getAbsolutePath());
-						cplex.writeSolution(solution_file.getAbsolutePath());
+						if (export_problem_file) cplex.exportModel(problem_file.getAbsolutePath());
+						if (export_solution_file) cplex.writeSolution(solution_file.getAbsolutePath());
 						double[] value = cplex.getValues(lp);
 						// double[] reduceCost = cplex.getReducedCosts(lp);
 						// double[] dual = cplex.getDuals(lp);
