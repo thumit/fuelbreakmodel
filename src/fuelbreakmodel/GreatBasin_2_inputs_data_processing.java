@@ -16,10 +16,12 @@ public class GreatBasin_2_inputs_data_processing {
 	private int[] n; 				// number of dynamic PODs for each fire minus one
 	private int[] ignition_POD; 	// the ignition POD of each fire
 												
-	private double[][] core_areas;					// w(e,ie) in the objective function, with e is the FireID, i is the dynamic POD			
+	private double[][] core_areas;				// w(e,ie) in the objective function, with e is the FireID, i is the dynamic POD			
 	private List<Integer>[][] adjacent_PODS;	// Adjacent PODs
 					
 	private int number_of_fuelbreaks;
+	private double[] break_length;
+	private double[][] break_area;	// maintenance area of fuel break b when management option k is implemented.
 	private int number_of_management_options;
 	private double[] q_0; 	// flame length capacity of a fuel break when no investment is made for that break
 	private double[][] q; 	// flame length capacity of a fuel break when a management option k is implemented 
@@ -196,19 +198,29 @@ public class GreatBasin_2_inputs_data_processing {
 			
 			number_of_fuelbreaks = total_rows;
 			number_of_management_options = 4;			// note k = 0, 1, 2, 3 in the model associated with k = 1, 2, 3, 4 in the manuscript_16_v4
+			break_length = new double[number_of_fuelbreaks];
+			break_area = new double[number_of_fuelbreaks][];
 			q_0 = new double[number_of_fuelbreaks]; 	// current capacity of a fuel break when it is not invested in maintenance
 			q = new double[number_of_fuelbreaks][]; 	// capacity of a fuel break when a management option k is implemented 
 			c = new double[number_of_fuelbreaks][]; 	// cost of a fuel break when a management option k is implemented 
 			for (int b = 0; b < number_of_fuelbreaks; b++) {
-				q[b] = new double[number_of_management_options];		// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
-				c[b] = new double[number_of_management_options];		// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
+				break_area[b] = new double[number_of_management_options];	// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
+				q[b] = new double[number_of_management_options];			// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
+				c[b] = new double[number_of_management_options];			// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
+				
+				break_length[b] = Double.parseDouble(data[b][5]);
+				
+				break_area[b][0] = Double.parseDouble(data[b][6]);
+				break_area[b][1] = Double.parseDouble(data[b][7]);
+				break_area[b][2] = Double.parseDouble(data[b][8]);
+				break_area[b][3] = Double.parseDouble(data[b][9]);
 				
 				c[b][0] = Double.parseDouble(data[b][10]);
 				c[b][1] = Double.parseDouble(data[b][11]);
 				c[b][2] = Double.parseDouble(data[b][12]);
 				c[b][3] = Double.parseDouble(data[b][13]);
 				
-				q_0[b] = Double.parseDouble(data[b][14]);	// currently not use in our model, if we use it then we need another  do nothing k option and change equation 2a to use = instead of <=
+				q_0[b] = Double.parseDouble(data[b][14]);	// currently not use in our model, if we use it then we need another do nothing k option and change equation 2a to use = instead of <=
 				
 				q[b][0] = Double.parseDouble(data[b][15]);
 				q[b][1] = Double.parseDouble(data[b][16]);
@@ -254,6 +266,14 @@ public class GreatBasin_2_inputs_data_processing {
 	
 	public int get_number_of_fuelbreaks() {
 		return number_of_fuelbreaks;
+	}
+	
+	public double[] get_break_length() {
+		return break_length;
+	}
+	
+	public double[][] get_break_area() {
+		return break_area;
 	}
 	
 	public int get_number_of_management_options() {

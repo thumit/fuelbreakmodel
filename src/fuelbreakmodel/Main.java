@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -44,7 +45,7 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0;
-				double budget = 150000;
+				double budget = 50000;
 				String test_case_description = "alloptions";
 				
 				// For the Great Basin data - 2 inputs needed
@@ -56,7 +57,9 @@ public class Main {
 				if (!outputFolderFile.exists()) outputFolderFile.mkdirs(); 	// Create output folder and its parents if they don't exist
 				File problem_file = new File(output_folder + "/problem.lp");
 				File solution_file = new File(output_folder + "/solution.sol");
-				File output_variables_file = new File(output_folder + "/output_1_variables.txt");
+				File output_solution_summary_file = new File(output_folder + "/output_1_solution_summary.txt");
+				File output_all_variables_file = new File(output_folder + "/output_3_all_variables.txt");
+				File output_nonzero_variables_file = new File(output_folder + "/output_4_nonzero_variables.txt");
 				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
@@ -66,11 +69,13 @@ public class Main {
 				int[] n = data_processing.get_n(); 									// number of dynamic PODs for each fire minus one
 				int[] ignition_POD = data_processing.get_ignition_POD(); 			// the ignition POD of each fire (always 1 as it is result of running the python script)
 															
-				double[][] core_areas = data_processing.get_core_areas();								// w(e,ie) or ENVC in the objective function, with e is the FireID, i is the dynamic POD				
+				double[][] core_areas = data_processing.get_core_areas();					// w(e,ie) or ENVC in the objective function, with e is the FireID, i is the dynamic POD				
 				List<Integer>[][] adjacent_PODS = data_processing.get_adjacent_PODS();		// Adjacent PODs
 								
 				int number_of_fuelbreaks = data_processing.get_number_of_fuelbreaks();
 				int number_of_management_options = data_processing.get_number_of_management_options(); 		// either 0, 1, 2, 3, 4 associated with break's width of 0, 100, 200, 300, 400 feet
+				double[] break_length = data_processing.get_break_length();
+				double[][] break_area = data_processing.get_break_area();
 				double[][] q = data_processing.get_q();		// the flame length capacity of a fuel break when a management option is implemented
 				double[][] c = data_processing.get_c(); 	// the cost of a fuel break when a management option is implemented
 
@@ -1011,12 +1016,107 @@ public class Main {
 						// WRITE SOLUTION --------------------------------------------------------------
 						System.out.println("Objective function value = " + objective_value);
 						
-						// output_01_variables
-						output_variables_file.delete();
-						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_variables_file))) {
+						// output_01_all_variables
+						output_solution_summary_file.delete();
+						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_solution_summary_file))) {
+//							String file_header = String.join("\t", "budget", "test_case_description", "optimality_gap",	"solution_time", "solution_gap",
+//									"objective_value", "num_breaks_treated", "length_breaks_treated", "cost_breaks_treated",
+//									"num_breaks_no_treat", "num_breaks_k_1", "num_breaks_k_2", "num_breaks_k_3", "num_breaks_k_4",
+//									"length_breaks_no_treat", "length_breaks_k_1", "length_breaks_k_2", "length_breaks_k_3", "length_breaks_k_4",
+//									"cost_breaks_no_treat", "cost_breaks_k_1", "cost_breaks_k_2", "cost_breaks_k_3", "cost_breaks_k_4");
+//							fileOut.write(file_header);
+							
+							double length_of_fuelbreaks = Arrays.stream(break_length).sum();
+							int num_breaks_treat = 0;
+							int[] num_breaks_treat_k = new int[number_of_management_options];
+							double length_breaks_treat = 0;
+							double[] length_breaks_treat_k = new double[number_of_management_options];
+							double area_breaks_treat = 0;
+							double[] area_breaks_treat_k = new double[number_of_management_options];
+							double cost_breaks_treat = 0;
+							double[] cost_breaks_treat_k = new double[number_of_management_options];
+							
+							for (int i = 0; i < value.length; i++) {
+								if (vname[i].startsWith("D")) {
+									int break_id = var_info_array[i].get_break_ID();
+									int management_option = var_info_array[i].get_magegement_option();
+									if (Math.round(value[i]) == 1) {	// if not round then solution such as 0.999999 will not be counted.
+										num_breaks_treat_k[management_option - 1]++;	// because k start from 0 in the model
+										num_breaks_treat++;
+										
+										length_breaks_treat_k[management_option - 1] = length_breaks_treat_k[management_option - 1] + break_length[break_id - 1];
+										length_breaks_treat = length_breaks_treat + break_length[break_id - 1];
+										
+										area_breaks_treat_k[management_option - 1] = area_breaks_treat_k[management_option - 1] + break_area[break_id - 1][management_option - 1];
+										area_breaks_treat = area_breaks_treat + break_area[break_id - 1][management_option - 1];
+										
+										cost_breaks_treat_k[management_option - 1] = cost_breaks_treat_k[management_option - 1] + c[break_id - 1][management_option - 1];
+										cost_breaks_treat = cost_breaks_treat + c[break_id - 1][management_option - 1];
+									}
+								}
+							}
+							int num_breaks_no_treat = number_of_fuelbreaks - num_breaks_treat;
+							double length_breaks_no_treat = length_of_fuelbreaks - length_breaks_treat;
+							double cost_breaks_no_treat = 0;
+							
+							fileOut.write("budget" + "\t" + budget);
+							fileOut.newLine(); fileOut.write("test_case_description" + "\t" + test_case_description); 
+							fileOut.newLine(); fileOut.write("optimality_gap" + "\t" + optimality_gap);
+							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
+							fileOut.newLine(); fileOut.write("solution_gap" + "\t" + "NA");
+							fileOut.newLine(); fileOut.write("objective_value" + "\t" + objective_value);
+							fileOut.newLine(); fileOut.write("num_breaks_treat" + "\t" + num_breaks_treat);
+							fileOut.newLine(); fileOut.write("num_breaks_no_treat" + "\t" + num_breaks_no_treat);
+							for (int k = 1; k < number_of_management_options + 1; k++ ) {
+								fileOut.newLine();
+								fileOut.write("num_breaks_treat_k" + k + "\t" + num_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+							}
+							fileOut.newLine(); fileOut.write("length_breaks_treat" + "\t" + length_breaks_treat);
+							fileOut.newLine(); fileOut.write("length_breaks_no_treat" + "\t" + length_breaks_no_treat);
+							for (int k = 1; k < number_of_management_options + 1; k++ ) {
+								fileOut.newLine();
+								fileOut.write("length_breaks_treat_k" + k + "\t" + length_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+							}
+							fileOut.newLine(); fileOut.write("area_breaks_treat" + "\t" + area_breaks_treat);
+							fileOut.newLine(); fileOut.write("area_breaks_no_treat" + "\t" + "NA");
+							for (int k = 1; k < number_of_management_options + 1; k++ ) {
+								fileOut.newLine();
+								fileOut.write("area_breaks_treat_k" + k + "\t" + area_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+							}
+							fileOut.newLine(); fileOut.write("cost_breaks_treat" + "\t" + cost_breaks_treat);
+							fileOut.newLine(); fileOut.write("cost_breaks_no_treat" + "\t" + cost_breaks_no_treat);
+							for (int k = 1; k < number_of_management_options + 1; k++ ) {
+								fileOut.newLine();
+								fileOut.write("cost_breaks_treat_k" + k + "\t" + cost_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+							}
+							
+							
+							fileOut.close();
+						} catch (IOException e) {
+							System.err.println("FileWriter(output_solution_summary_file error - "	+ e.getClass().getName() + ": " + e.getMessage());
+						}
+						output_solution_summary_file.createNewFile();	
+						
+						// output_03_all_variables
+						output_all_variables_file.delete();
+						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_all_variables_file))) {
 							String file_header = String.join("\t", "var_id", "var_name", "var_value");
 							fileOut.write(file_header);
-							
+							for (int i = 0; i < value.length; i++) {
+								fileOut.newLine();
+								fileOut.write(i + "\t" + vname[i] + "\t" + value[i]);
+							}
+							fileOut.close();
+						} catch (IOException e) {
+							System.err.println("FileWriter(output_variables_file) error - "	+ e.getClass().getName() + ": " + e.getMessage());
+						}
+						output_all_variables_file.createNewFile();		
+						
+						// output_04_nonzero_all_variables
+						output_nonzero_variables_file.delete();
+						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_nonzero_variables_file))) {
+							String file_header = String.join("\t", "var_id", "var_name", "var_value");
+							fileOut.write(file_header);
 							for (int i = 0; i < value.length; i++) {
 								if (value[i] != 0) {	// only write variable that is not zero
 									fileOut.newLine();
@@ -1025,12 +1125,9 @@ public class Main {
 							}
 							fileOut.close();
 						} catch (IOException e) {
-							System.err.println("FileWriter(output_variables_file) error - "	+ e.getClass().getName() + ": " + e.getMessage());
+							System.err.println("FileWriter(output_nonzero_variables_file) error - "	+ e.getClass().getName() + ": " + e.getMessage());
 						}
-						output_variables_file.createNewFile();							
-						
-						
-
+						output_nonzero_variables_file.createNewFile();	
 					}
 					cplex.end();
 				} catch (Exception e) {
