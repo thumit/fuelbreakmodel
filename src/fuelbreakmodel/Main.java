@@ -45,7 +45,7 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0;
-				double budget = 50000;
+				double budget = 100000;
 				String test_case_description = "alloptions";
 				
 				// For the Great Basin data - 2 inputs needed
@@ -58,6 +58,7 @@ public class Main {
 				File problem_file = new File(output_folder + "/problem.lp");
 				File solution_file = new File(output_folder + "/solution.sol");
 				File output_solution_summary_file = new File(output_folder + "/output_1_solution_summary.txt");
+				File output_fuelbreaks_decisions_file = new File(output_folder + "/output_2_fuelbreaks_decisions.txt");
 				File output_all_variables_file = new File(output_folder + "/output_3_all_variables.txt");
 				File output_nonzero_variables_file = new File(output_folder + "/output_4_nonzero_variables.txt");
 				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file);
@@ -1019,13 +1020,6 @@ public class Main {
 						// output_01_all_variables
 						output_solution_summary_file.delete();
 						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_solution_summary_file))) {
-//							String file_header = String.join("\t", "budget", "test_case_description", "optimality_gap",	"solution_time", "solution_gap",
-//									"objective_value", "num_breaks_treated", "length_breaks_treated", "cost_breaks_treated",
-//									"num_breaks_no_treat", "num_breaks_k_1", "num_breaks_k_2", "num_breaks_k_3", "num_breaks_k_4",
-//									"length_breaks_no_treat", "length_breaks_k_1", "length_breaks_k_2", "length_breaks_k_3", "length_breaks_k_4",
-//									"cost_breaks_no_treat", "cost_breaks_k_1", "cost_breaks_k_2", "cost_breaks_k_3", "cost_breaks_k_4");
-//							fileOut.write(file_header);
-							
 							double length_of_fuelbreaks = Arrays.stream(break_length).sum();
 							int num_breaks_treat = 0;
 							int[] num_breaks_treat_k = new int[number_of_management_options];
@@ -1090,12 +1084,51 @@ public class Main {
 								fileOut.write("cost_breaks_treat_k" + k + "\t" + cost_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
 							
-							
 							fileOut.close();
 						} catch (IOException e) {
 							System.err.println("FileWriter(output_solution_summary_file error - "	+ e.getClass().getName() + ": " + e.getMessage());
 						}
 						output_solution_summary_file.createNewFile();	
+						
+						
+						// output_2_fuelbreaks_decisions
+						output_fuelbreaks_decisions_file.delete();
+						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_fuelbreaks_decisions_file))) {
+							int[] selected_solution = new int[number_of_fuelbreaks];
+							for (int b = 0; b < number_of_fuelbreaks; b++) {
+								selected_solution[b] = 0;	// no maintenance to align with GIS file (k=0 is not 100 FT wide anymore)
+							}
+							
+							for (int i = 0; i < value.length; i++) {
+								if (vname[i].startsWith("D")) {
+									int break_id = var_info_array[i].get_break_ID();
+									int management_option = var_info_array[i].get_magegement_option();
+									if (Math.round(value[i]) == 1) {	// if not round then solution such as 0.999999 will not be counted.
+										selected_solution[break_id - 1] = management_option;						
+									}
+								}
+							}
+							
+							fileOut.write("break_id" + "\t" + "selected_k" + "\t" + "k_0" + "\t" + "k_1" + "\t" + "k_2" + "\t" + "k_3" + "\t" + "k_4" + "\t"); 
+							for (int b = 0; b < number_of_fuelbreaks; b++) {
+								int break_id = b + 1;	// to align with GIS file (break will not start from 0, but 1)
+								fileOut.newLine();
+								fileOut.write(break_id + "\t" + selected_solution[b] + "\t"); 
+								for (int k = 0; k < number_of_management_options + 1; k++) {	// loop from 0 to 4 associated with no management (k_0), 100 FT (K_1), 200 FT, 300 FT, 400 FT, to align with GIS file
+									if (selected_solution[b] == k) {
+										fileOut.write(1 + "\t"); 
+									} else {
+										fileOut.write(0 + "\t"); 
+									}
+								}
+							}
+							
+							fileOut.close();
+						} catch (IOException e) {
+							System.err.println("FileWriter(output_2_fuelbreaks_decisions error - "	+ e.getClass().getName() + ": " + e.getMessage());
+						}
+						output_fuelbreaks_decisions_file.createNewFile();			
+						
 						
 						// output_03_all_variables
 						output_all_variables_file.delete();
@@ -1112,13 +1145,14 @@ public class Main {
 						}
 						output_all_variables_file.createNewFile();		
 						
+						
 						// output_04_nonzero_all_variables
 						output_nonzero_variables_file.delete();
 						try (BufferedWriter fileOut = new BufferedWriter(new FileWriter(output_nonzero_variables_file))) {
 							String file_header = String.join("\t", "var_id", "var_name", "var_value");
 							fileOut.write(file_header);
 							for (int i = 0; i < value.length; i++) {
-								if (value[i] != 0) {	// only write variable that is not zero
+								if (Math.round(value[i]) != 0) {	// only write variable that is not zero, avoid print out very very small number such as 0.0000000000012
 									fileOut.newLine();
 									fileOut.write(i + "\t" + vname[i] + "\t" + value[i]);
 								}
