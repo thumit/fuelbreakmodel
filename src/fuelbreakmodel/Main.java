@@ -45,7 +45,7 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0;
-				double budget = 100000;
+				double budget = 50000;
 				String test_case_description = "alloptions";
 				
 				// For the Great Basin data - 2 inputs needed
@@ -1009,6 +1009,9 @@ public class Main {
 						Status cplex_status = cplex.getStatus();
 						int cplex_algorithm = cplex.getAlgorithm();
 						long cplex_iteration = cplex.getNiterations64();
+						int cplex_total_variables = cplex.getNcols();
+						int cplex_total_constraints = cplex.getNrows();
+						double solution_gap = cplex.getMIPRelativeGap();
 						time_end = System.currentTimeMillis();		// measure time after solving
 						time_solving = (double) (time_end - time_start) / 1000;
 						
@@ -1054,11 +1057,16 @@ public class Main {
 							double cost_breaks_no_treat = 0;
 							
 							fileOut.write("budget" + "\t" + budget);
-							fileOut.newLine(); fileOut.write("test_case_description" + "\t" + test_case_description); 
+							fileOut.newLine(); fileOut.write("test_case_description" + "\t" + test_case_description);
+							fileOut.newLine(); fileOut.write("num_variables" + "\t" + cplex_total_variables); 
+							fileOut.newLine(); fileOut.write("num_constraints" + "\t" + cplex_total_constraints); 
 							fileOut.newLine(); fileOut.write("optimality_gap" + "\t" + optimality_gap);
+							fileOut.newLine(); fileOut.write("cplex_algorithm" + "\t" + cplex_algorithm);
+							fileOut.newLine(); fileOut.write("cplex_iteration" + "\t" + cplex_iteration);
+							fileOut.newLine(); fileOut.write("cplex_status" + "\t" + cplex_status);
+							fileOut.newLine(); fileOut.write("solution_gap" + "\t" + solution_gap);
 							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
-							fileOut.newLine(); fileOut.write("solution_gap" + "\t" + "NA");
-							fileOut.newLine(); fileOut.write("objective_value" + "\t" + objective_value);
+							fileOut.newLine(); fileOut.write("solution_objective_value" + "\t" + objective_value);
 							fileOut.newLine(); fileOut.write("num_breaks_treat" + "\t" + num_breaks_treat);
 							fileOut.newLine(); fileOut.write("num_breaks_no_treat" + "\t" + num_breaks_no_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
@@ -1113,12 +1121,12 @@ public class Main {
 							for (int b = 0; b < number_of_fuelbreaks; b++) {
 								int break_id = b + 1;	// to align with GIS file (break will not start from 0, but 1)
 								fileOut.newLine();
-								fileOut.write(break_id + "\t" + selected_solution[b] + "\t"); 
+								fileOut.write(break_id + "\t" + selected_solution[b]); 
 								for (int k = 0; k < number_of_management_options + 1; k++) {	// loop from 0 to 4 associated with no management (k_0), 100 FT (K_1), 200 FT, 300 FT, 400 FT, to align with GIS file
 									if (selected_solution[b] == k) {
-										fileOut.write(1 + "\t"); 
+										fileOut.write("\t" + 1); 
 									} else {
-										fileOut.write(0 + "\t"); 
+										fileOut.write("\t" + 0); 
 									}
 								}
 							}
