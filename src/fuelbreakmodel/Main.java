@@ -44,10 +44,10 @@ public class Main {
 			public void run() {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
-				double optimality_gap = 0;
-				String test_case_description = "Test case 4.1";
-				double budget = 1964108.15;
-				boolean excluding_largest_fires = true;
+				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
+				String test_case_description = "Test case 2.2";
+				double budget = 3928216.3;
+				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
 				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
@@ -998,8 +998,9 @@ public class Main {
 					cplex.addMinimize(cplex.scalProd(var, objvals));
 					objvals = null;		// Clear arrays to save memory
 //						cplex.setParam(IloCplex.Param.RootAlgorithm, IloCplex.Algorithm.Auto); // Auto choose optimization method
-					cplex.setParam(IloCplex.Param.MIP.Strategy.Search, IloCplex.MIPSearch.Traditional);	// MIP method
-					if (optimality_gap > 0) cplex.setParam(IloCplex.DoubleParam.EpGap, optimality_gap); // Optimality Gap
+					cplex.setParam(IloCplex.Param.MIP.Strategy.Search, IloCplex.MIPSearch.Traditional);		// MIP method
+//					cplex.setParam(IloCplex.DoubleParam.EpAGap, optimality_gap);	// absolute MIP gap tolerance: https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-absolute-mip-gap-tolerance
+					if (optimality_gap > 0) cplex.setParam(IloCplex.DoubleParam.EpGap, optimality_gap); 	// relative MIP gap tolerance: https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-relative-mip-gap-tolerance
 //						int solvingTimeLimit = 30 * 60; //Get time Limit in minute * 60 = seconds
 //						cplex.setParam(IloCplex.DoubleParam.TimeLimit, solvingTimeLimit); // Set Time limit
 //						cplex.setParam(IloCplex.Param.MIP.Tolerances.Integrality, 0); 	// Set integrality tolerance: https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-integrality-tolerance;    https://www.ibm.com/support/pages/why-does-binary-or-integer-variable-take-noninteger-value-solution
