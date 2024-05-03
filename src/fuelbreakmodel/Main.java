@@ -45,8 +45,9 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0;
+				String test_case_description = "Test case 4.1";
 				double budget = 1964108.15;
-				String test_case_description = "Test case 2.1";
+				boolean excluding_largest_fires = true;
 				
 				// For the Great Basin data - 2 inputs needed
 				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
@@ -62,7 +63,7 @@ public class Main {
 				File output_fuelbreaks_decisions_file = new File(output_folder + "/output_2_fuelbreaks_decisions.txt");
 				File output_all_variables_file = new File(output_folder + "/output_3_all_variables.txt");
 				File output_nonzero_variables_file = new File(output_folder + "/output_4_nonzero_variables.txt");
-				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file);
+				GreatBasin_2_inputs_data_processing data_processing = new GreatBasin_2_inputs_data_processing(input_1_file, input_2_file, excluding_largest_fires);
 							
 				// Read all inputs and get information--------------------------------------------------------------------------------------------
 				int number_of_fires = data_processing.get_number_of_fires();		// number of fires
@@ -109,6 +110,13 @@ public class Main {
 						var_info_list.add(var_info);
 						objlist.add((double) 0);
 						vnamelist.add(var_name);
+//						if (k == 3) {
+//							vlblist.add((double) 1);
+//							vublist.add((double) 1);
+//						} else {
+//							vlblist.add((double) 0);
+//							vublist.add((double) 0);
+//						}
 						vlblist.add((double) 0);
 						vublist.add((double) 1);
 						vtlist.add(IloNumVarType.Bool);

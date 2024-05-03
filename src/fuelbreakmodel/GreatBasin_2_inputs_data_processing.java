@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -30,7 +31,53 @@ public class GreatBasin_2_inputs_data_processing {
 	private List<Integer>[][][] b_list;	// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e										
 	private List<Double>[][][] fl_list;	// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e		
 
-	public GreatBasin_2_inputs_data_processing(File input_1_file, File input_2_file) {
+	public String[][] get_data_excluding_larest_fires(String[][] data, double fire_size_percentile) {		// 0.8 mean keep 80% and remove 20% largest fires
+		// Note that the input has been sorted by increasing values of "FIRE_NUMBE" and "poly_id"
+		List<Integer> original_fire_id_list = new ArrayList<Integer>();	
+		List<Double> trim_size_list = new ArrayList<Double>();	
+
+		number_of_fires = 0;
+		for (int i = 0; i < data.length; i++) {
+			int origin_id = Integer.parseInt(data[i][0]);				// 'FIRENUMBE' column
+			double trim_size_value = Double.parseDouble(data[i][2]);	// 'trim_size' column
+			if (!original_fire_id_list.contains(origin_id)) {
+				original_fire_id_list.add(origin_id);
+				trim_size_list.add(trim_size_value);
+				number_of_fires++;
+			}
+		}
+		double[] trim_size = trim_size_list.stream().mapToDouble(Double::doubleValue).toArray();	// convert list to array
+		Arrays.sort(trim_size);
+		
+		int percentile_index = (int) Math.round(Math.floor(trim_size.length * fire_size_percentile));	// Calculate the percentile index
+		double percentile_trim_size_threshole = trim_size[percentile_index];
+		
+		// count the number of row that would be included
+		int count = 0;		
+		for (String[] row : data) {
+		    double trim_size_value = Double.parseDouble(row[2]);
+		    if (trim_size_value <= percentile_trim_size_threshole) {
+		        count++;
+		    }
+		}
+		
+		// add the included data to new_data
+		String[][] trim_data = new String[count][];
+		count = 0;
+		for (String[] row : data) {
+			double trim_size_value = Double.parseDouble(row[2]);
+			if (trim_size_value <= percentile_trim_size_threshole) {
+				trim_data[count] = row;
+				count++;
+		    }
+		}
+		
+		System.out.println("number of rows in the original data = " + data.length);
+		System.out.println("number of rows included in the trimmed data = " + trim_data.length);
+		return trim_data;
+	}
+	
+	public GreatBasin_2_inputs_data_processing(File input_1_file, File input_2_file, boolean excluding_largest_fires) {
 		try {
 			// Read input_1 --------------------------------------------------------------------------------------------
 			// Note that the input has been sorted by increasing values of "FIRE_NUMBE" and "poly_id"
@@ -49,7 +96,11 @@ public class GreatBasin_2_inputs_data_processing {
 				}
 			}
 			
-			// List<List<String>> fire_infor = new ArrayList<List<String>>();
+			if (excluding_largest_fires) {
+				data = get_data_excluding_larest_fires(data, 0.8);
+				total_rows = data.length;
+			}
+			
 			List<Integer> original_fire_id_list = new ArrayList<Integer>();	
 			List<Integer> num_of_PODS_list = new ArrayList<Integer>();	
 
@@ -63,6 +114,7 @@ public class GreatBasin_2_inputs_data_processing {
 					number_of_fires++;
 				}
 			}
+			System.out.println("number of fires in the model = " + number_of_fires);
 			original_fire_id = Stream.of(original_fire_id_list.toArray(new Integer[original_fire_id_list.size()])).mapToInt(Integer::intValue).toArray();	// convert list to array
 			number_of_PODS = Stream.of(num_of_PODS_list.toArray(new Integer[num_of_PODS_list.size()])).mapToInt(Integer::intValue).toArray();	// convert list to array		
 			n = new int[number_of_fires]; 				// number of dynamic PODs for each fire minus one
