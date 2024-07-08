@@ -166,7 +166,7 @@ public class Main {
 					String var_name = "C_" + fuelbreak_ID;
 					Information_Variable var_info = new Information_Variable(var_name);
 					var_info_list.add(var_info);
-					objlist.add((double) -1 / Double.MAX_VALUE);
+					objlist.add((double) 1 / Double.MAX_VALUE);
 					vnamelist.add(var_name);
 					vlblist.add((double) 0);
 					vublist.add(Double.MAX_VALUE);
