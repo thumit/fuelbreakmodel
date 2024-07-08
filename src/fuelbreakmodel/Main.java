@@ -44,8 +44,8 @@ public class Main {
 			public void run() {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
-				double optimality_gap = 0;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
-				String test_case_description = "Test case 1.0";
+				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
+				String test_case_description = "Test case 2.2";
 				double budget = 3928216.3;
 				boolean excluding_largest_fires = false;
 				
@@ -110,15 +110,15 @@ public class Main {
 						var_info_list.add(var_info);
 						objlist.add((double) 0);
 						vnamelist.add(var_name);
-						if (k == 0) {
-							vlblist.add((double) 1);
-							vublist.add((double) 1);
-						} else {
-							vlblist.add((double) 0);
-							vublist.add((double) 0);
-						}
-//						vlblist.add((double) 0);
-//						vublist.add((double) 1);
+//						if (k == 3) {
+//							vlblist.add((double) 1);
+//							vublist.add((double) 1);
+//						} else {
+//							vlblist.add((double) 0);
+//							vublist.add((double) 0);
+//						}
+						vlblist.add((double) 0);
+						vublist.add((double) 1);
 						vtlist.add(IloNumVarType.Bool);
 						D[b][k] = nvars;
 						nvars++;
@@ -166,7 +166,7 @@ public class Main {
 					String var_name = "C_" + fuelbreak_ID;
 					Information_Variable var_info = new Information_Variable(var_name);
 					var_info_list.add(var_info);
-					objlist.add((double) 1 / Double.MAX_VALUE);
+					objlist.add((double) 1 / Double.MAX_VALUE);	// we can set this to zero because solution will not change.
 					vnamelist.add(var_name);
 					vlblist.add((double) 0);
 					vublist.add(Double.MAX_VALUE);
@@ -886,21 +886,21 @@ public class Main {
 					c10_num++;
 				}
 				
-//				// 10b
-//				// Add constraint
-//				c10_indexlist.add(new ArrayList<Integer>());
-//				c10_valuelist.add(new ArrayList<Double>());
-//				
-//				for (int b = 0; b < number_of_fuelbreaks; b++) {
-//					// Add Sigma C[b]
-//					c10_indexlist.get(c10_num).add(C[b]);
-//					c10_valuelist.get(c10_num).add((double) 1);
-//				}
-//				
-//				// add bounds
-//				c10_lblist.add((double) 0);			// Lower bound = 0
-//				c10_ublist.add(budget);				// Upper bound = budget
-//				c10_num++;
+				// 10b
+				// Add constraint
+				c10_indexlist.add(new ArrayList<Integer>());
+				c10_valuelist.add(new ArrayList<Double>());
+				
+				for (int b = 0; b < number_of_fuelbreaks; b++) {
+					// Add Sigma C[b]
+					c10_indexlist.get(c10_num).add(C[b]);
+					c10_valuelist.get(c10_num).add((double) 1);
+				}
+				
+				// add bounds
+				c10_lblist.add((double) 0);			// Lower bound = 0
+				c10_ublist.add(budget);				// Upper bound = budget
+				c10_num++;
 				
 				double[] c10_lb = Stream.of(c10_lblist.toArray(new Double[c10_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
 				double[] c10_ub = Stream.of(c10_ublist.toArray(new Double[c10_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
