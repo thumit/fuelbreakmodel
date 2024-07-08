@@ -117,8 +117,8 @@ public class Main {
 							vlblist.add((double) 0);
 							vublist.add((double) 0);
 						}
-						vlblist.add((double) 0);
-						vublist.add((double) 1);
+//						vlblist.add((double) 0);
+//						vublist.add((double) 1);
 						vtlist.add(IloNumVarType.Bool);
 						D[b][k] = nvars;
 						nvars++;
