@@ -21,7 +21,7 @@ public class Information_Variable {
 			case "Q":
 				break_ID = Integer.parseInt(term[0]);
 				break;
-			case "C":
+			case "A":
 				break_ID = Integer.parseInt(term[0]);
 				break;
 			case "Y":

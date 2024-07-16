@@ -46,14 +46,14 @@ public class Main {
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
 				String test_case_description = "Test case 2.2";
-				double budget = 3928216.3;
+				double budget = 19640.99;
 				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
 				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
 //				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_attribute_table_2_fires_example.txt");
 				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_attribute_table_final.txt");
-				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_fuel_breaks_with_costs_v3.txt");
+				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_attribute_table_and_fuel_breaks_core.txt");
 				String output_folder = source_folder + "/model_outputs/Manuscript 19/" + test_case_description;
 				File outputFolderFile = new File(output_folder);
 				if (!outputFolderFile.exists()) outputFolderFile.mkdirs(); 	// Create output folder and its parents if they don't exist
@@ -160,10 +160,10 @@ public class Main {
 					nvars++;
 				}
 				
-				int[] C = new int[number_of_fuelbreaks];	// C(b)	is the cost associated with break b, need to change to A later to match with manuscript 19_02
+				int[] A = new int[number_of_fuelbreaks];	// A(b)	is maintenance area associated with break b
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
 					int fuelbreak_ID = b + 1;
-					String var_name = "C_" + fuelbreak_ID;
+					String var_name = "A_" + fuelbreak_ID;
 					Information_Variable var_info = new Information_Variable(var_name);
 					var_info_list.add(var_info);
 					objlist.add((double) 0);
@@ -171,7 +171,7 @@ public class Main {
 					vlblist.add((double) 0);
 					vublist.add(Double.MAX_VALUE);
 					vtlist.add(IloNumVarType.Float);
-					C[b] = nvars;
+					A[b] = nvars;
 					nvars++;
 				}
 							
@@ -639,14 +639,14 @@ public class Main {
 					c10_indexlist.add(new ArrayList<Integer>());
 					c10_valuelist.add(new ArrayList<Double>());
 					
-					// Add C[b]
-					c10_indexlist.get(c10_num).add(C[b]);
+					// Add A[b]
+					c10_indexlist.get(c10_num).add(A[b]);
 					c10_valuelist.get(c10_num).add((double) 1);
 					
 					for (int k = 0; k < number_of_management_options; k++) {
-						// Add - sigma c[b][k] * D[b][k]
+						// Add - sigma a[b][k] * D[b][k]
 						c10_indexlist.get(c10_num).add(D[b][k]);
-						c10_valuelist.get(c10_num).add(-c[b][k]);
+						c10_valuelist.get(c10_num).add(-break_area[b][k]);
 					}
 					
 					// add bounds
@@ -661,8 +661,8 @@ public class Main {
 				c10_valuelist.add(new ArrayList<Double>());
 				
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
-					// Add Sigma C[b]
-					c10_indexlist.get(c10_num).add(C[b]);
+					// Add Sigma A[b]
+					c10_indexlist.get(c10_num).add(A[b]);
 					c10_valuelist.get(c10_num).add((double) 1);
 				}
 				
@@ -809,8 +809,6 @@ public class Main {
 							double[] length_breaks_treat_k = new double[number_of_management_options];
 							double area_breaks_treat = 0;
 							double[] area_breaks_treat_k = new double[number_of_management_options];
-							double cost_breaks_treat = 0;
-							double[] cost_breaks_treat_k = new double[number_of_management_options];
 							
 							for (int i = 0; i < value.length; i++) {
 								if (vname[i].startsWith("D")) {
@@ -825,15 +823,11 @@ public class Main {
 										
 										area_breaks_treat_k[management_option - 1] = area_breaks_treat_k[management_option - 1] + break_area[break_id - 1][management_option - 1];
 										area_breaks_treat = area_breaks_treat + break_area[break_id - 1][management_option - 1];
-										
-										cost_breaks_treat_k[management_option - 1] = cost_breaks_treat_k[management_option - 1] + c[break_id - 1][management_option - 1];
-										cost_breaks_treat = cost_breaks_treat + c[break_id - 1][management_option - 1];
 									}
 								}
 							}
 							int num_breaks_no_treat = number_of_fuelbreaks - num_breaks_treat;
 							double length_breaks_no_treat = length_of_fuelbreaks - length_breaks_treat;
-							double cost_breaks_no_treat = 0;
 							
 							fileOut.write("budget" + "\t" + budget);
 							fileOut.newLine(); fileOut.write("test_case_description" + "\t" + test_case_description);
@@ -863,12 +857,6 @@ public class Main {
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
 								fileOut.newLine();
 								fileOut.write("area_breaks_treat_k" + k + "\t" + area_breaks_treat_k[k - 1]);	// because k start from 0 in the model
-							}
-							fileOut.newLine(); fileOut.write("cost_breaks_treat" + "\t" + cost_breaks_treat);
-							fileOut.newLine(); fileOut.write("cost_breaks_no_treat" + "\t" + cost_breaks_no_treat);
-							for (int k = 1; k < number_of_management_options + 1; k++ ) {
-								fileOut.newLine();
-								fileOut.write("cost_breaks_treat_k" + k + "\t" + cost_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
 							
 							fileOut.close();
