@@ -394,6 +394,59 @@ public class Main {
 				c3_ublist = null;
 				System.out.println("Total constraints as in model formulation eq. (3):   " + c3_num + "             " + dateFormat.format(new Date()));
 				
+				
+				// Constraints 4------------------------------------------------------		
+				List<List<Integer>> c4_indexlist = new ArrayList<List<Integer>>();	
+				List<List<Double>> c4_valuelist = new ArrayList<List<Double>>();
+				List<Double> c4_lblist = new ArrayList<Double>();	
+				List<Double> c4_ublist = new ArrayList<Double>();
+				int c4_num = 0;
+				
+				for (int e = 0; e < number_of_fires; e++) {
+					for (int j = 0; j < number_of_PODS[e]; j++) {
+						if (j != ignition_POD[e]) {	// if this is not the ignition POD
+							for (int i : adjacent_PODS[e][j]) {
+								// Add constraint
+								c4_indexlist.add(new ArrayList<Integer>());
+								c4_valuelist.add(new ArrayList<Double>());
+								
+								// Add X[e][i]
+								c4_indexlist.get(c4_num).add(X[e][j]);
+								c4_valuelist.get(c4_num).add((double) 1);
+								
+								// Add -B[e][i][j]
+								c4_indexlist.get(c4_num).add(B[e][i][j]);
+								c4_valuelist.get(c4_num).add((double) -1);
+							}
+							// add bounds
+							c4_lblist.add((double) 0);	// Lower bound = 0
+							c4_ublist.add((double) 1);	// Upper bound = 1	(when X = 1 and B = 0)
+							c4_num++;
+						}
+					}
+				}
+				
+				double[] c4_lb = Stream.of(c4_lblist.toArray(new Double[c4_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
+				double[] c4_ub = Stream.of(c4_ublist.toArray(new Double[c4_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
+				int[][] c4_index = new int[c4_num][];
+				double[][] c4_value = new double[c4_num][];
+
+				for (int i = 0; i < c4_num; i++) {
+					c4_index[i] = new int[c4_indexlist.get(i).size()];
+					c4_value[i] = new double[c4_indexlist.get(i).size()];
+					for (int j = 0; j < c4_indexlist.get(i).size(); j++) {
+						c4_index[i][j] = c4_indexlist.get(i).get(j);
+						c4_value[i][j] = c4_valuelist.get(i).get(j);			
+					}
+				}	
+				
+				// Clear lists to save memory
+				c4_indexlist = null;	
+				c4_valuelist = null;
+				c4_lblist = null;	
+				c4_ublist = null;
+				System.out.println("Total constraints as in model formulation eq. (4):   " + c4_num + "             " + dateFormat.format(new Date()));
+				
 									
 				// Constraints 5------------------------------------------------------		
 				List<List<Integer>> c5_indexlist = new ArrayList<List<Integer>>();	
@@ -403,22 +456,41 @@ public class Main {
 				int c5_num = 0;
 				
 				for (int e = 0; e < number_of_fires; e++) {
-					for (int i = 0; i < number_of_PODS[e]; i++) {
-						for (int j : adjacent_PODS[e][i]) {
-							if (j == ignition_POD[e]) {	// // if this is the ignition POD then set all B = 0 to avoid spreading back to ignition POD
-								// Add constraint
-								c5_indexlist.add(new ArrayList<Integer>());
-								c5_valuelist.add(new ArrayList<Double>());
-								
-								// Add B[e][i][j]
+					for (int j = 0; j < number_of_PODS[e]; j++) {
+						if (j != ignition_POD[e]) {	// if this is not the ignition POD
+							// Add constraint
+							c5_indexlist.add(new ArrayList<Integer>());
+							c5_valuelist.add(new ArrayList<Double>());
+							
+							// Add sigma B[e][i][j]
+							for (int i : adjacent_PODS[e][j]) {
 								c5_indexlist.get(c5_num).add(B[e][i][j]);
 								c5_valuelist.get(c5_num).add((double) 1);
-								
-								// add bounds
-								c5_lblist.add((double) 0);
-								c5_ublist.add((double) 0);		// Upper bound = 0
-								c5_num++;
 							}
+							
+							// Add -X[e][j]
+							c5_indexlist.get(c5_num).add(X[e][j]);
+							c5_valuelist.get(c5_num).add((double) -1);
+							
+							// add bounds
+							c5_lblist.add((double) 0);						// Lower bound = 0
+							c5_ublist.add((double) Double.MAX_VALUE);		// Upper bound = max
+							c5_num++;
+						} else {	// if this is the ignition POD then set all B = 0 to avoid spreading back to ignition POD
+							// Add constraint
+							c5_indexlist.add(new ArrayList<Integer>());
+							c5_valuelist.add(new ArrayList<Double>());
+							
+							// Add sigma B[e][i][j]
+							for (int i : adjacent_PODS[e][j]) {
+								c5_indexlist.get(c5_num).add(B[e][i][j]);
+								c5_valuelist.get(c5_num).add((double) 1);
+							}
+							
+							// add bounds
+							c5_lblist.add((double) 0);		// Lower bound = 0
+							c5_ublist.add((double) 0);		// Upper bound = 0
+							c5_num++;
 						}
 					}
 				}
@@ -705,7 +777,7 @@ public class Main {
 					// Add constraints
 					lp.addRows(c2_lb, c2_ub, c2_index, c2_value); 		// Constraints 2
 					lp.addRows(c3_lb, c3_ub, c3_index, c3_value); 		// Constraints 3
-//					lp.addRows(c4_lb, c4_ub, c4_index, c4_value); 		// Constraints 4
+					lp.addRows(c4_lb, c4_ub, c4_index, c4_value); 		// Constraints 4
 					lp.addRows(c5_lb, c5_ub, c5_index, c5_value); 		// Constraints 5
 					lp.addRows(c6_lb, c6_ub, c6_index, c6_value);		// Constraints 6
 					lp.addRows(c7_lb, c7_ub, c7_index, c7_value); 		// Constraints 7
@@ -726,7 +798,7 @@ public class Main {
 					// Set constraints set name: Notice THIS WILL EXTREMELY SLOW THE SOLVING PROCESS (recommend for debugging only)
 					int indexOfC2 = c2_num;
 					int indexOfC3 = indexOfC2 + c3_num;
-//					int indexOfC4 = indexOfC3 + c4_num;
+					int indexOfC4 = indexOfC3 + c4_num;
 					int indexOfC5 = indexOfC3 + c5_num;
 					int indexOfC6 = indexOfC5 + c6_num;
 					int indexOfC7 = indexOfC6 + c7_num;
@@ -737,7 +809,7 @@ public class Main {
 					for (int i = 0; i < lp.getRanges().length; i++) {	
 						if (0 <= i && i < indexOfC2) lp.getRanges() [i].setName("S.2");
 						if (indexOfC2<=i && i<indexOfC3) lp.getRanges() [i].setName("S.3" + i);
-//						if (indexOfC3<=i && i<indexOfC4) lp.getRanges() [i].setName("S.4" + i);
+						if (indexOfC3<=i && i<indexOfC4) lp.getRanges() [i].setName("S.4" + i);
 						if (indexOfC3<=i && i<indexOfC5) lp.getRanges() [i].setName("S.5" + i);
 						if (indexOfC5<=i && i<indexOfC6) lp.getRanges() [i].setName("S.6" + i);
 						if (indexOfC6<=i && i<indexOfC7) lp.getRanges() [i].setName("S.7" + i);
@@ -812,8 +884,8 @@ public class Main {
 							int num_breaks_no_treat = number_of_fuelbreaks - num_breaks_treat;
 							double length_breaks_no_treat = length_of_fuelbreaks - length_breaks_treat;
 							
-							fileOut.newLine(); fileOut.write("test case" + "\t" + test_case_description);
-							fileOut.write("budget" + "\t" + budget);
+							fileOut.write("test case" + "\t" + test_case_description);
+							fileOut.newLine(); fileOut.write("budget" + "\t" + budget);
 							fileOut.newLine(); fileOut.write("number of variables" + "\t" + cplex_total_variables); 
 							fileOut.newLine(); fileOut.write("number of constraints" + "\t" + cplex_total_constraints);
 							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
