@@ -24,6 +24,9 @@ public class Information_Variable {
 			case "A":
 				break_ID = Integer.parseInt(term[0]);
 				break;
+			case "C":
+				break_ID = Integer.parseInt(term[0]);
+				break;
 			case "Y":
 				break;
 			default:

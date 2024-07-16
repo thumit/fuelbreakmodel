@@ -26,7 +26,7 @@ public class GreatBasin_2_inputs_data_processing {
 	private int number_of_management_options;
 	private double[] q_0; 	// flame length capacity of a fuel break when no investment is made for that break
 	private double[][] q; 	// flame length capacity of a fuel break when a management option k is implemented 
-	private double[][] c; 	// core areas impacted by a fuel break when a management option k is implemented 										
+	private double[][] c; 	// core areas impacted directly by a fuel break when a management option k is implemented 										
 	
 	private List<Integer>[][][] b_list;	// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e										
 	private List<Double>[][][] fl_list;	// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e		
@@ -254,7 +254,7 @@ public class GreatBasin_2_inputs_data_processing {
 			break_area = new double[number_of_fuelbreaks][];
 			q_0 = new double[number_of_fuelbreaks]; 	// current capacity of a fuel break when it is not invested in maintenance
 			q = new double[number_of_fuelbreaks][]; 	// capacity of a fuel break when a management option k is implemented 
-			c = new double[number_of_fuelbreaks][]; 	// corea areas impacted by a fuel break when a management option k is implemented 
+			c = new double[number_of_fuelbreaks][]; 	// core areas impacted directly by a fuel break when a management option k is implemented 
 			for (int b = 0; b < number_of_fuelbreaks; b++) {
 				break_area[b] = new double[number_of_management_options];	// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet
 				q[b] = new double[number_of_management_options];			// 4 options k = 0, 1, 2, 3 associated with break width 100, 200, 300, 400 Feet

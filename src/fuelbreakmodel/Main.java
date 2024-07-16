@@ -45,16 +45,16 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
-				String test_case_description = "2.1";
-				double budget = 19640.99;	// 19640.99
-				boolean excluding_largest_fires = false;
+				String test_case_description = "0% no large";
+				double budget = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137
+				boolean excluding_largest_fires = true;
 				
 				// For the Great Basin data - 2 inputs needed
 				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
-//				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_attribute_table_2_fires_example.txt");
-				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_attribute_table_final.txt");
-				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 19/GB_attribute_table_and_fuel_breaks_core.txt");
-				String output_folder = source_folder + "/model_outputs/Manuscript 19/" + test_case_description;
+//				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 20/GB_attribute_table_2_fires_example.txt");
+				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 20/GB_attribute_table_final.txt");
+				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 20/GB_attribute_table_and_fuel_breaks_core.txt");
+				String output_folder = source_folder + "/model_outputs/Manuscript 20/" + test_case_description;
 				File outputFolderFile = new File(output_folder);
 				if (!outputFolderFile.exists()) outputFolderFile.mkdirs(); 	// Create output folder and its parents if they don't exist
 				File problem_file = new File(output_folder + "/problem.lp");
@@ -80,7 +80,7 @@ public class Main {
 				double[] break_length = data_processing.get_break_length();
 				double[][] break_area = data_processing.get_break_area();	// maintenance area of a fuel break when a management option is implemented
 				double[][] q = data_processing.get_q();		// the flame length capacity of a fuel break when a management option is implemented
-				double[][] c = data_processing.get_c(); 	// the cost of a fuel break when a management option is implemented
+				double[][] c = data_processing.get_c(); 	// core areas impacted directly by a fuel break when a management option is implemented
 
 				List<Integer>[][][] b_list = data_processing.get_b_list();		// b_list stores all the breaks within the shared boundary of 2 adjacent polygons i and j of fire e
 				List<Double>[][][] fl_list = data_processing.get_fl_list();		// fl_list stores flame lengths across all the break segments within the shared boundary of 2 adjacent polygons i and j of fire e
@@ -172,6 +172,21 @@ public class Main {
 					vublist.add(Double.MAX_VALUE);
 					vtlist.add(IloNumVarType.Float);
 					A[b] = nvars;
+					nvars++;
+				}
+				
+				int[] C = new int[number_of_fuelbreaks];	// C(b)	direct loss to core areas associated with break b
+				for (int b = 0; b < number_of_fuelbreaks; b++) {
+					int fuelbreak_ID = b + 1;
+					String var_name = "C_" + fuelbreak_ID;
+					Information_Variable var_info = new Information_Variable(var_name);
+					var_info_list.add(var_info);
+					objlist.add((double) 0);
+					vnamelist.add(var_name);
+					vlblist.add((double) 0);
+					vublist.add(Double.MAX_VALUE);
+					vtlist.add(IloNumVarType.Float);
+					C[b] = nvars;
 					nvars++;
 				}
 							
@@ -694,14 +709,14 @@ public class Main {
 					c10_indexlist.add(new ArrayList<Integer>());
 					c10_valuelist.add(new ArrayList<Double>());
 					
-					// Add A[b]
+					// Add C[b]
 					c10_indexlist.get(c10_num).add(A[b]);
 					c10_valuelist.get(c10_num).add((double) 1);
 					
 					for (int k = 0; k < number_of_management_options; k++) {
-						// Add - sigma a[b][k] * D[b][k]
+						// Add - sigma c[b][k] * D[b][k]
 						c10_indexlist.get(c10_num).add(D[b][k]);
-						c10_valuelist.get(c10_num).add(-break_area[b][k]);
+						c10_valuelist.get(c10_num).add(-c[b][k]);
 					}
 					
 					// add bounds
@@ -716,7 +731,7 @@ public class Main {
 				c10_valuelist.add(new ArrayList<Double>());
 				
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
-					// Add Sigma A[b]
+					// Add Sigma C[b]
 					c10_indexlist.get(c10_num).add(A[b]);
 					c10_valuelist.get(c10_num).add((double) 1);
 				}
