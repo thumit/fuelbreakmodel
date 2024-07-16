@@ -45,8 +45,8 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
-				String test_case_description = "Test case 2.2";
-				double budget = 19640.99;
+				String test_case_description = "2.1";
+				double budget = 19640.99;	// 19640.99
 				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
