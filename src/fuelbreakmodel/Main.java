@@ -405,24 +405,7 @@ public class Main {
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int i = 0; i < number_of_PODS[e]; i++) {
 						for (int j : adjacent_PODS[e][i]) {
-							if (j != ignition_POD[e]) {	// if this is not the ignition POD
-								// Add constraint
-								c5_indexlist.add(new ArrayList<Integer>());
-								c5_valuelist.add(new ArrayList<Double>());
-								
-								// Add B[e][i][j]
-								c5_indexlist.get(c5_num).add(B[e][i][j]);
-								c5_valuelist.get(c5_num).add((double) 1);
-								
-								// Add -X[e][i]
-								c5_indexlist.get(c5_num).add(X[e][i]);
-								c5_valuelist.get(c5_num).add((double) -1);
-								
-								// add bounds
-								c5_lblist.add((double) -1);		// Lower bound = -1 will make this equation not fail
-								c5_ublist.add((double) 0);		// Upper bound = 0
-								c5_num++;
-							} else {	// if this is the ignition POD then set all B = 0 to avoid spreading back to ignition POD
+							if (j == ignition_POD[e]) {	// // if this is the ignition POD then set all B = 0 to avoid spreading back to ignition POD
 								// Add constraint
 								c5_indexlist.add(new ArrayList<Integer>());
 								c5_valuelist.add(new ArrayList<Double>());
@@ -829,34 +812,34 @@ public class Main {
 							int num_breaks_no_treat = number_of_fuelbreaks - num_breaks_treat;
 							double length_breaks_no_treat = length_of_fuelbreaks - length_breaks_treat;
 							
+							fileOut.newLine(); fileOut.write("test case" + "\t" + test_case_description);
 							fileOut.write("budget" + "\t" + budget);
-							fileOut.newLine(); fileOut.write("test_case_description" + "\t" + test_case_description);
-							fileOut.newLine(); fileOut.write("num_variables" + "\t" + cplex_total_variables); 
-							fileOut.newLine(); fileOut.write("num_constraints" + "\t" + cplex_total_constraints); 
+							fileOut.newLine(); fileOut.write("number of variables" + "\t" + cplex_total_variables); 
+							fileOut.newLine(); fileOut.write("number of constraints" + "\t" + cplex_total_constraints);
+							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
+							fileOut.newLine(); fileOut.write("solution_objective_value" + "\t" + objective_value);
+							fileOut.newLine(); fileOut.write("solution_gap" + "\t" + solution_gap);
 							fileOut.newLine(); fileOut.write("optimality_gap" + "\t" + optimality_gap);
 							fileOut.newLine(); fileOut.write("cplex_algorithm" + "\t" + cplex_algorithm);
 							fileOut.newLine(); fileOut.write("cplex_iteration" + "\t" + cplex_iteration);
 							fileOut.newLine(); fileOut.write("cplex_status" + "\t" + cplex_status);
-							fileOut.newLine(); fileOut.write("solution_gap" + "\t" + solution_gap);
-							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
-							fileOut.newLine(); fileOut.write("solution_objective_value" + "\t" + objective_value);
-							fileOut.newLine(); fileOut.write("num_breaks_treat" + "\t" + num_breaks_treat);
-							fileOut.newLine(); fileOut.write("num_breaks_no_treat" + "\t" + num_breaks_no_treat);
+							fileOut.newLine(); fileOut.write("number of fuel breaks without maintenance" + "\t" + num_breaks_no_treat);
+							fileOut.newLine(); fileOut.write("number of fuel breaks with maintenance" + "\t" + num_breaks_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
 								fileOut.newLine();
-								fileOut.write("num_breaks_treat_k" + k + "\t" + num_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+								fileOut.write("number of fuel breaks with maintenance option k = " + k + "\t" + num_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
-							fileOut.newLine(); fileOut.write("length_breaks_treat" + "\t" + length_breaks_treat);
-							fileOut.newLine(); fileOut.write("length_breaks_no_treat" + "\t" + length_breaks_no_treat);
+							fileOut.newLine(); fileOut.write("total length (meters) of fuel breaks without maintenance" + "\t" + length_breaks_no_treat);
+							fileOut.newLine(); fileOut.write("total length (meters) of fuel breaks with maintenance" + "\t" + length_breaks_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
 								fileOut.newLine();
-								fileOut.write("length_breaks_treat_k" + k + "\t" + length_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+								fileOut.write("total length (meters) of fuel breaks with maintenance option k = " + k + "\t" + length_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
-							fileOut.newLine(); fileOut.write("area_breaks_treat" + "\t" + area_breaks_treat);
-							fileOut.newLine(); fileOut.write("area_breaks_no_treat" + "\t" + "NA");
+							fileOut.newLine(); fileOut.write("total area (acres) of fuel breaks without maintenance" + "\t" + "NA");
+							fileOut.newLine(); fileOut.write("total area (acres) of fuel breaks with maintenance" + "\t" + area_breaks_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
 								fileOut.newLine();
-								fileOut.write("area_breaks_treat_k" + k + "\t" + area_breaks_treat_k[k - 1]);	// because k start from 0 in the model
+								fileOut.write("total area (acres) of fuel breaks with maintenance option k = " + k + "\t" + area_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
 							
 							fileOut.close();
