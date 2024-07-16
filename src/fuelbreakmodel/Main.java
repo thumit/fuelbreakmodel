@@ -78,7 +78,7 @@ public class Main {
 				int number_of_fuelbreaks = data_processing.get_number_of_fuelbreaks();
 				int number_of_management_options = data_processing.get_number_of_management_options(); 		// either 0, 1, 2, 3, 4 associated with break's width of 0, 100, 200, 300, 400 feet
 				double[] break_length = data_processing.get_break_length();
-				double[][] break_area = data_processing.get_break_area();
+				double[][] break_area = data_processing.get_break_area();	// maintenance area of a fuel break when a management option is implemented
 				double[][] q = data_processing.get_q();		// the flame length capacity of a fuel break when a management option is implemented
 				double[][] c = data_processing.get_c(); 	// the cost of a fuel break when a management option is implemented
 
@@ -160,7 +160,7 @@ public class Main {
 					nvars++;
 				}
 				
-				int[] C = new int[number_of_fuelbreaks];	// C(b)	is the cost associated with break b
+				int[] C = new int[number_of_fuelbreaks];	// C(b)	is the cost associated with break b, need to change to A later to match with manuscript 19_02
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
 					int fuelbreak_ID = b + 1;
 					String var_name = "C_" + fuelbreak_ID;
@@ -226,26 +226,6 @@ public class Main {
 						}
 					}
 				}
-				
-//				int[][] F = null;	// F(e,ie) with e is the FireID, i is the dynamic POD
-//				F = new int[number_of_fires][];
-//				for (int e = 0; e < number_of_fires; e++) {
-//					F[e] = new int[number_of_PODS[e]];
-//					for (int i = 0; i < number_of_PODS[e]; i++) {
-//						int fire_ID = original_fire_id[e];
-//						int POD_ID = i + 1;
-//						String var_name = "F_" + fire_ID + "_" + POD_ID;
-//						Information_Variable var_info = new Information_Variable(var_name);
-//						var_info_list.add(var_info);
-//						objlist.add((double) 0);
-//						vnamelist.add(var_name);
-//						vlblist.add((double) 0);
-//						vublist.add((double) number_of_PODS[e]);
-//						vtlist.add(IloNumVarType.Int);
-//						F[e][i] = nvars;
-//						nvars++;
-//					}
-//				}
 				
 				// Convert lists to 1-D arrays
 				double[] objvals = Stream.of(objlist.toArray(new Double[objlist.size()])).mapToDouble(Double::doubleValue).toArray();
@@ -413,59 +393,6 @@ public class Main {
 				c3_lblist = null;	
 				c3_ublist = null;
 				System.out.println("Total constraints as in model formulation eq. (3):   " + c3_num + "             " + dateFormat.format(new Date()));
-				
-				
-//				// Constraints 4------------------------------------------------------		
-//				List<List<Integer>> c4_indexlist = new ArrayList<List<Integer>>();	
-//				List<List<Double>> c4_valuelist = new ArrayList<List<Double>>();
-//				List<Double> c4_lblist = new ArrayList<Double>();	
-//				List<Double> c4_ublist = new ArrayList<Double>();
-//				int c4_num = 0;
-//				
-//				for (int e = 0; e < number_of_fires; e++) {
-//					for (int j = 0; j < number_of_PODS[e]; j++) {
-//						if (j != ignition_POD[e]) {	// if this is not the ignition POD
-//							// Add constraint
-//							c4_indexlist.add(new ArrayList<Integer>());
-//							c4_valuelist.add(new ArrayList<Double>());
-//							
-//							// Add X[e][j]
-//							c4_indexlist.get(c4_num).add(X[e][j]);
-//							c4_valuelist.get(c4_num).add((double) 1);
-//							
-//							// Add -Sigma B[e][i][j]
-//							for (int i : adjacent_PODS[e][j]) {
-//								c4_indexlist.get(c4_num).add(B[e][i][j]);
-//								c4_valuelist.get(c4_num).add((double) -1);
-//							}
-//							// add bounds
-//							c4_lblist.add((double) -adjacent_PODS[e][j].size());	// Lower bound = - total number of adjacent PODS of POD j
-//							c4_ublist.add((double) 0);								// Upper bound = 0
-//							c4_num++;
-//						}
-//					}
-//				}
-//				
-//				double[] c4_lb = Stream.of(c4_lblist.toArray(new Double[c4_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
-//				double[] c4_ub = Stream.of(c4_ublist.toArray(new Double[c4_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
-//				int[][] c4_index = new int[c4_num][];
-//				double[][] c4_value = new double[c4_num][];
-//
-//				for (int i = 0; i < c4_num; i++) {
-//					c4_index[i] = new int[c4_indexlist.get(i).size()];
-//					c4_value[i] = new double[c4_indexlist.get(i).size()];
-//					for (int j = 0; j < c4_indexlist.get(i).size(); j++) {
-//						c4_index[i][j] = c4_indexlist.get(i).get(j);
-//						c4_value[i][j] = c4_valuelist.get(i).get(j);			
-//					}
-//				}	
-//				
-//				// Clear lists to save memory
-//				c4_indexlist = null;	
-//				c4_valuelist = null;
-//				c4_lblist = null;	
-//				c4_ublist = null;
-//				System.out.println("Total constraints as in model formulation eq. (4):   " + c4_num + "             " + dateFormat.format(new Date()));
 				
 									
 				// Constraints 5------------------------------------------------------		
@@ -697,164 +624,6 @@ public class Main {
 				c7_lblist = null;	
 				c7_ublist = null;
 				System.out.println("Total constraints as in model formulation eq. (7):   " + c7_num + "             " + dateFormat.format(new Date()));
-				
-				
-//				// Constraints 8------------------------------------------------------		
-//				List<List<Integer>> c8_indexlist = new ArrayList<List<Integer>>();	
-//				List<List<Double>> c8_valuelist = new ArrayList<List<Double>>();
-//				List<Double> c8_lblist = new ArrayList<Double>();	
-//				List<Double> c8_ublist = new ArrayList<Double>();
-//				int c8_num = 0;
-//				
-//				for (int e = 0; e < number_of_fires; e++) {
-//					for (int i = 0; i < number_of_PODS[e]; i++) {
-//						if (i == ignition_POD[e]) {
-//							// Add constraint
-//							c8_indexlist.add(new ArrayList<Integer>());
-//							c8_valuelist.add(new ArrayList<Double>());
-//
-//							// Add F[e][i]		--> POD i is the ignition location
-//							c8_indexlist.get(c8_num).add(F[e][i]);
-//							c8_valuelist.get(c8_num).add((double) 1);
-//
-//							// add bounds
-//							c8_lblist.add((double) 1);	// Lower bound = 1
-//							c8_ublist.add((double) 1);	// Upper bound = 1
-//							c8_num++;
-//						}
-//					}
-//				}
-//				
-//				double[] c8_lb = Stream.of(c8_lblist.toArray(new Double[c8_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
-//				double[] c8_ub = Stream.of(c8_ublist.toArray(new Double[c8_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
-//				int[][] c8_index = new int[c8_num][];
-//				double[][] c8_value = new double[c8_num][];
-//
-//				for (int i = 0; i < c8_num; i++) {
-//					c8_index[i] = new int[c8_indexlist.get(i).size()];
-//					c8_value[i] = new double[c8_indexlist.get(i).size()];
-//					for (int j = 0; j < c8_indexlist.get(i).size(); j++) {
-//						c8_index[i][j] = c8_indexlist.get(i).get(j);
-//						c8_value[i][j] = c8_valuelist.get(i).get(j);			
-//					}
-//				}	
-//				
-//				// Clear lists to save memory
-//				c8_indexlist = null;	
-//				c8_valuelist = null;
-//				c8_lblist = null;	
-//				c8_ublist = null;
-//				System.out.println("Total constraints as in model formulation eq. (8):   " + c8_num + "             " + dateFormat.format(new Date()));
-//				
-//				
-//				// Constraints 9------------------------------------------------------		
-//				List<List<Integer>> c9_indexlist = new ArrayList<List<Integer>>();	
-//				List<List<Double>> c9_valuelist = new ArrayList<List<Double>>();
-//				List<Double> c9_lblist = new ArrayList<Double>();	
-//				List<Double> c9_ublist = new ArrayList<Double>();
-//				int c9_num = 0;
-//				
-//				for (int e = 0; e < number_of_fires; e++) {
-//					for (int j = 0; j < number_of_PODS[e]; j++) {
-//						for (int i : adjacent_PODS[e][j]) {
-//							if (j != ignition_POD[e]) {
-//								// 9a
-//								// Add constraint
-//								c9_indexlist.add(new ArrayList<Integer>());
-//								c9_valuelist.add(new ArrayList<Double>());
-//								
-//								// Add F[e][j]
-//								c9_indexlist.get(c9_num).add(F[e][j]);
-//								c9_valuelist.get(c9_num).add((double) 1);
-//								
-//								// Add -F[e][i]
-//								c9_indexlist.get(c9_num).add(F[e][i]);
-//								c9_valuelist.get(c9_num).add((double) -1);
-//								
-//								// Add n[e]*B[e][i][j]
-//								c9_indexlist.get(c9_num).add(B[e][i][j]);
-//								c9_valuelist.get(c9_num).add((double) n[e]);
-//								
-//								// add bounds
-//								// c9_lblist.add((double) Integer.MIN_VALUE);	// Lower bound
-//								c9_lblist.add((double) -number_of_PODS[e]);		// Lower bound is modified to optimize better
-//								c9_ublist.add((double) n[e] + 1);				// Upper bound = n[e] + 1
-//								c9_num++;
-//								
-//								// 9b
-//								// Add constraint
-//								c9_indexlist.add(new ArrayList<Integer>());
-//								c9_valuelist.add(new ArrayList<Double>());
-//								
-//								// Add F[e][j]
-//								c9_indexlist.get(c9_num).add(F[e][j]);
-//								c9_valuelist.get(c9_num).add((double) 1);
-//								
-//								// Add -F[e][i]
-//								c9_indexlist.get(c9_num).add(F[e][i]);
-//								c9_valuelist.get(c9_num).add((double) -1);
-//								
-//								// Add -n[e]*B[e][i][j]
-//								c9_indexlist.get(c9_num).add(B[e][i][j]);
-//								c9_valuelist.get(c9_num).add((double) -n[e]);
-//								
-//								// add bounds
-//								c9_lblist.add((double) -n[e] + 1);				// Lower bound = -n[e] + 1
-//								// c9_ublist.add((double) Integer.MAX_VALUE);	// Upper bound = INF
-//								c9_ublist.add((double) n[e] + 1);				// Upper bound is modified to optimize better
-//								c9_num++;
-//							}
-//						}
-//					}
-//				}
-//				
-//				// 9c
-//				for (int e = 0; e < number_of_fires; e++) {
-//					for (int j = 0; j < number_of_PODS[e]; j++) {
-//						if (j != ignition_POD[e]) {
-//							// Add constraint
-//							c9_indexlist.add(new ArrayList<Integer>());
-//							c9_valuelist.add(new ArrayList<Double>());
-//							
-//							// Add F[e][j]
-//							c9_indexlist.get(c9_num).add(F[e][j]);
-//							c9_valuelist.get(c9_num).add((double) 1);
-//							
-//							// Add -(n[e] + 1)*B[e][i][j]
-//							for (int i : adjacent_PODS[e][j]) {
-//								c9_indexlist.get(c9_num).add(B[e][i][j]);
-//								c9_valuelist.get(c9_num).add((double) -n[e] - 1);
-//							}
-//							
-//							// add bounds
-//							// c9_lblist.add((double) Integer.MIN_VALUE);								// Lower bound
-//							c9_lblist.add((double) -number_of_PODS[e] * adjacent_PODS[e][j].size());	// Lower bound is modified to optimize better
-//							c9_ublist.add((double) 0);													// Upper bound = 0
-//							c9_num++;
-//						}
-//					}
-//				}
-//				
-//				double[] c9_lb = Stream.of(c9_lblist.toArray(new Double[c9_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
-//				double[] c9_ub = Stream.of(c9_ublist.toArray(new Double[c9_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
-//				int[][] c9_index = new int[c9_num][];
-//				double[][] c9_value = new double[c9_num][];
-//
-//				for (int i = 0; i < c9_num; i++) {
-//					c9_index[i] = new int[c9_indexlist.get(i).size()];
-//					c9_value[i] = new double[c9_indexlist.get(i).size()];
-//					for (int j = 0; j < c9_indexlist.get(i).size(); j++) {
-//						c9_index[i][j] = c9_indexlist.get(i).get(j);
-//						c9_value[i][j] = c9_valuelist.get(i).get(j);			
-//					}
-//				}	
-//				
-//				// Clear lists to save memory
-//				c9_indexlist = null;	
-//				c9_valuelist = null;
-//				c9_lblist = null;	
-//				c9_ublist = null;
-//				System.out.println("Total constraints as in model formulation eq. (9):   " + c9_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 10------------------------------------------------------		
