@@ -276,7 +276,8 @@ public class Main {
 				
 				// Constraints 2------------------------------------------------------
 				// Constraints 2------------------------------------------------------
-				int c2_num = 0;
+				int total_constraints = 0;
+				int c_num = 0;
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
 					// Add constraint
 					cons_indexlist.add(new ArrayList<Integer>());
@@ -284,47 +285,49 @@ public class Main {
 					
 					for (int k = 0; k < number_of_management_options; k++) {
 						// Add sigma D[b][k]
-						cons_indexlist.get(c2_num).add(D[b][k]);
-						cons_valuelist.get(c2_num).add((double) 1);
+						cons_indexlist.get(c_num).add(D[b][k]);
+						cons_valuelist.get(c_num).add((double) 1);
 					}
 					
 					// add bounds
 					cons_lblist.add((double) 0);	
 					cons_ublist.add((double) 1);	
-					c2_num++;
+					c_num++;
 				}
+				int c2_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (2):   " + c2_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 3------------------------------------------------------
 				// Constraints 3------------------------------------------------------
-				int c3_num = 0;
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
 					// Add constraint
 					cons_indexlist.add(new ArrayList<Integer>());
 					cons_valuelist.add(new ArrayList<Double>());
 					
 					// Add Q[b]
-					cons_indexlist.get(c2_num).add(Q[b]);
-					cons_valuelist.get(c2_num).add((double) 1);
+					cons_indexlist.get(c_num).add(Q[b]);
+					cons_valuelist.get(c_num).add((double) 1);
 					
 					for (int k = 0; k < number_of_management_options; k++) {
 						// Add - sigma q[b][k] * D[b][k]
-						cons_indexlist.get(c2_num).add(D[b][k]);
-						cons_valuelist.get(c2_num).add(-q[b][k]);
+						cons_indexlist.get(c_num).add(D[b][k]);
+						cons_valuelist.get(c_num).add(-q[b][k]);
 					}
 					
 					// add bounds
 					cons_lblist.add((double) 0);	
 					cons_ublist.add((double) 0);	
-					c3_num++;
+					c_num++;
 				}
+				int c3_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (3):   " + c3_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 4------------------------------------------------------
 				// Constraints 4------------------------------------------------------
-				int c4_num = 0;
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int i = 0; i < number_of_PODS[e] - 1; i++) {
 						for (int j = i + 1; j < number_of_PODS[e]; j++) {
@@ -334,27 +337,28 @@ public class Main {
 								cons_valuelist.add(new ArrayList<Double>());
 
 								// Add fl[e][i][j] * Y[e][i][j]
-								cons_indexlist.get(c2_num).add(Y[e][i][j]);
-								cons_valuelist.get(c2_num).add(fl_list[e][i][j].get(b_list[e][i][j].indexOf(b)));		// index of break_id in the b_list is associated with index of that break flame length in the fl_list
+								cons_indexlist.get(c_num).add(Y[e][i][j]);
+								cons_valuelist.get(c_num).add(fl_list[e][i][j].get(b_list[e][i][j].indexOf(b)));		// index of break_id in the b_list is associated with index of that break flame length in the fl_list
 								
 								// Add -Q[b]
-								cons_indexlist.get(c2_num).add(Q[b]);
-								cons_valuelist.get(c2_num).add((double) -1);
+								cons_indexlist.get(c_num).add(Q[b]);
+								cons_valuelist.get(c_num).add((double) -1);
 
 								// add bounds
 								cons_lblist.add((double) -Double.MAX_VALUE);	// Lower bound = negative flame length
 								cons_ublist.add((double) 0);					// Upper bound = 0
-								c4_num++;
+								c_num++;
 							}
 						}
 					}
 				}
+				int c4_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (4):   " + c4_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 5------------------------------------------------------
 				// Constraints 5------------------------------------------------------
-				int c5_num = 0;
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int i = 0; i < number_of_PODS[e]; i++) {
 						if (i == ignition_POD[e]) {
@@ -363,22 +367,23 @@ public class Main {
 							cons_valuelist.add(new ArrayList<Double>());
 
 							// Add X[e][i]		--> POD i is the ignition location
-							cons_indexlist.get(c2_num).add(X[e][i]);
-							cons_valuelist.get(c2_num).add((double) 1);
+							cons_indexlist.get(c_num).add(X[e][i]);
+							cons_valuelist.get(c_num).add((double) 1);
 
 							// add bounds
 							cons_lblist.add((double) 1);	// Lower bound = 1
 							cons_ublist.add((double) 1);	// Upper bound = 1
-							c5_num++;
+							c_num++;
 						}
 					}
 				}
+				int c5_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (5):   " + c5_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 6------------------------------------------------------
 				// Constraints 6------------------------------------------------------
-				int c6_num = 0;
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int j = 0; j < number_of_PODS[e]; j++) {
 						if (j != ignition_POD[e]) {	// if this is not the ignition POD
@@ -388,26 +393,27 @@ public class Main {
 								cons_valuelist.add(new ArrayList<Double>());
 								
 								// Add X[e][i]
-								cons_indexlist.get(c2_num).add(X[e][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(X[e][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// Add -B[e][i][j]
-								cons_indexlist.get(c2_num).add(B[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) -1);
+								cons_indexlist.get(c_num).add(B[e][i][j]);
+								cons_valuelist.get(c_num).add((double) -1);
 							}
 							// add bounds
 							cons_lblist.add((double) 0);	// Lower bound = 0
 							cons_ublist.add((double) 1);	// Upper bound = 1	(when X = 1 and B = 0)
-							c6_num++;
+							c_num++;
 						}
 					}
 				}
+				int c6_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (6):   " + c6_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 7------------------------------------------------------
 				// Constraints 7------------------------------------------------------		
-				int c7_num = 0;
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int j = 0; j < number_of_PODS[e]; j++) {
 						if (j != ignition_POD[e]) {	// if this is not the ignition POD
@@ -417,18 +423,18 @@ public class Main {
 							
 							// Add sigma B[e][i][j]
 							for (int i : adjacent_PODS[e][j]) {
-								cons_indexlist.get(c2_num).add(B[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(B[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 							}
 							
 							// Add -X[e][j]
-							cons_indexlist.get(c2_num).add(X[e][j]);
-							cons_valuelist.get(c2_num).add((double) -1);
+							cons_indexlist.get(c_num).add(X[e][j]);
+							cons_valuelist.get(c_num).add((double) -1);
 							
 							// add bounds
 							cons_lblist.add((double) 0);						// Lower bound = 0
 							cons_ublist.add((double) Double.MAX_VALUE);		// Upper bound = max
-							c2_num++;
+							c_num++;
 						} else {	// if this is the ignition POD then set all B = 0 to avoid spreading back to ignition POD
 							// Add constraint
 							cons_indexlist.add(new ArrayList<Integer>());
@@ -436,23 +442,24 @@ public class Main {
 							
 							// Add sigma B[e][i][j]
 							for (int i : adjacent_PODS[e][j]) {
-								cons_indexlist.get(c2_num).add(B[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(B[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 							}
 							
 							// add bounds
 							cons_lblist.add((double) 0);		// Lower bound = 0
 							cons_ublist.add((double) 0);		// Upper bound = 0
-							c7_num++;
+							c_num++;
 						}
 					}
 				}
+				int c7_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (7):   " + c7_num + "             " + dateFormat.format(new Date()));
 				
 								
 				// Constraints 8------------------------------------------------------
 				// Constraints 8------------------------------------------------------
-				int c8_num = 0;
 				// 8a
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int i = 0; i < number_of_PODS[e] - 1; i++) {
@@ -463,21 +470,21 @@ public class Main {
 								cons_valuelist.add(new ArrayList<Double>());
 								
 								// Add Y[e][i][j]
-								cons_indexlist.get(c2_num).add(Y[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(Y[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// Add -X[e][i]
-								cons_indexlist.get(c2_num).add(X[e][i]);
-								cons_valuelist.get(c2_num).add((double) -1);
+								cons_indexlist.get(c_num).add(X[e][i]);
+								cons_valuelist.get(c_num).add((double) -1);
 								
 								// Add +X[e][j]
-								cons_indexlist.get(c2_num).add(X[e][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(X[e][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// add bounds
 								cons_lblist.add((double) 0);			// Lower bound = 0
 								cons_ublist.add((double) 2);			// Upper bound = 2 (bound is modified to optimize better)
-								c8_num++;
+								c_num++;
 							}
 						}
 					}
@@ -493,31 +500,32 @@ public class Main {
 								cons_valuelist.add(new ArrayList<Double>());
 								
 								// Add Y[e][i][j]
-								cons_indexlist.get(c2_num).add(Y[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(Y[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// Add +X[e][i]
-								cons_indexlist.get(c2_num).add(X[e][i]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(X[e][i]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// Add -X[e][j]
-								cons_indexlist.get(c2_num).add(X[e][j]);
-								cons_valuelist.get(c2_num).add((double) -1);
+								cons_indexlist.get(c_num).add(X[e][j]);
+								cons_valuelist.get(c_num).add((double) -1);
 								
 								// add bounds
 								cons_lblist.add((double) 0);	// Lower bound = 0
 								cons_ublist.add((double) 2);	// Upper bound = 2 (bound is modified to optimize better)
-								c8_num++;
+								c_num++;
 							}
 						}
 					}
 				}
+				int c8_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (8):   " + c8_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 9------------------------------------------------------
 				// Constraints 9------------------------------------------------------	
-				int c9_num = 0;
 				for (int e = 0; e < number_of_fires; e++) {
 					for (int i = 0; i < number_of_PODS[e]; i++) {
 						for (int j : adjacent_PODS[e][i]) {
@@ -528,17 +536,17 @@ public class Main {
 								cons_valuelist.add(new ArrayList<Double>());
 								
 								// Add B[e][i][j]
-								cons_indexlist.get(c2_num).add(B[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(B[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// Add Y[e][i][j]
-								cons_indexlist.get(c2_num).add(Y[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(Y[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// add bounds
 								cons_lblist.add((double) 0);		// Lower bound = 0
 								cons_ublist.add((double) 1);		// Upper bound = 1
-								c9_num++;
+								c_num++;
 							}
 							
 							// 9b
@@ -548,66 +556,71 @@ public class Main {
 								cons_valuelist.add(new ArrayList<Double>());
 								
 								// Add B[e][i][j]
-								cons_indexlist.get(c2_num).add(B[e][i][j]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(B[e][i][j]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// Add Y[e][j][i]
-								cons_indexlist.get(c2_num).add(Y[e][j][i]);
-								cons_valuelist.get(c2_num).add((double) 1);
+								cons_indexlist.get(c_num).add(Y[e][j][i]);
+								cons_valuelist.get(c_num).add((double) 1);
 								
 								// add bounds
 								cons_lblist.add((double) 0);		// Lower bound = 0
 								cons_ublist.add((double) 1);		// Upper bound = 1
-								c9_num++;
+								c_num++;
 							}
 						}
 					}
 				}
+				int c9_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (9):   " + c9_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 10------------------------------------------------------		
 				// Constraints 10------------------------------------------------------	
-				int c10_num = 0;
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
 					// Add constraint
 					cons_indexlist.add(new ArrayList<Integer>());
 					cons_valuelist.add(new ArrayList<Double>());
 					
 					// Add C[b]
-					cons_indexlist.get(c2_num).add(A[b]);
-					cons_valuelist.get(c2_num).add((double) 1);
+					cons_indexlist.get(c_num).add(A[b]);
+					cons_valuelist.get(c_num).add((double) 1);
 					
 					for (int k = 0; k < number_of_management_options; k++) {
 						// Add - sigma c[b][k] * D[b][k]
-						cons_indexlist.get(c2_num).add(D[b][k]);
-						cons_valuelist.get(c2_num).add(-c[b][k]);
+						cons_indexlist.get(c_num).add(D[b][k]);
+						cons_valuelist.get(c_num).add(-c[b][k]);
 					}
 					
 					// add bounds
 					cons_lblist.add((double) 0);	
 					cons_ublist.add((double) 0);	
-					c10_num++;
+					c_num++;
 				}
+				int c10_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (10):   " + c10_num + "             " + dateFormat.format(new Date()));
 				
 				
 				// Constraints 11------------------------------------------------------	
 				// Constraints 11------------------------------------------------------	
-				int c11_num = 0;
 				cons_indexlist.add(new ArrayList<Integer>());
 				cons_valuelist.add(new ArrayList<Double>());
 				
 				for (int b = 0; b < number_of_fuelbreaks; b++) {
 					// Add Sigma C[b]
-					cons_indexlist.get(c2_num).add(A[b]);
-					cons_valuelist.get(c2_num).add((double) 1);
+					cons_indexlist.get(c_num).add(A[b]);
+					cons_valuelist.get(c_num).add((double) 1);
 				}
 				
 				// add bounds
 				cons_lblist.add((double) 0);			// Lower bound = 0
 				cons_ublist.add(budget);				// Upper bound = budget
-				c11_num++;
+				c_num++;
+				
+				int c11_num = c_num - total_constraints;
+				total_constraints = c_num;
 				System.out.println("Total constraints as in model formulation eq. (11):   " + c11_num + "             " + dateFormat.format(new Date()));
 				
 				
@@ -617,10 +630,10 @@ public class Main {
 				// Convert to arrays ------------------------------------------------------
 				double[] cons_lb = Stream.of(cons_lblist.toArray(new Double[cons_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
 				double[] cons_ub = Stream.of(cons_ublist.toArray(new Double[cons_ublist.size()])).mapToDouble(Double::doubleValue).toArray();		
-				int[][] cons_index = new int[c2_num][];
-				double[][] cons_value = new double[c2_num][];
+				int[][] cons_index = new int[c_num][];
+				double[][] cons_value = new double[c_num][];
 
-				for (int i = 0; i < c2_num; i++) {
+				for (int i = 0; i < c_num; i++) {
 					cons_index[i] = new int[cons_indexlist.get(i).size()];
 					cons_value[i] = new double[cons_indexlist.get(i).size()];
 					for (int j = 0; j < cons_indexlist.get(i).size(); j++) {
