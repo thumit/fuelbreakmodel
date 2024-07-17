@@ -45,9 +45,9 @@ public class Main {
 				boolean export_problem_file = false;
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
-				String test_case_description = "0% no large";
+				String test_case_description = "0%";
 				double budget = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137
-				boolean excluding_largest_fires = true;
+				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
 				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
@@ -110,13 +110,15 @@ public class Main {
 						var_info_list.add(var_info);
 						objlist.add((double) 0);
 						vnamelist.add(var_name);
-//						if (k == 3) {
-//							vlblist.add((double) 1);
+						// activate the below for uniform plans, need to change value of k
+//						if (k == 0) {
+//							vlblist.add((double) 0);
 //							vublist.add((double) 1);
 //						} else {
 //							vlblist.add((double) 0);
 //							vublist.add((double) 0);
 //						}
+						// activate the below for flexible plans
 						vlblist.add((double) 0);
 						vublist.add((double) 1);
 						vtlist.add(IloNumVarType.Bool);
@@ -879,6 +881,8 @@ public class Main {
 							double[] length_breaks_treat_k = new double[number_of_management_options];
 							double area_breaks_treat = 0;
 							double[] area_breaks_treat_k = new double[number_of_management_options];
+							double core_area_treat = 0;
+							double[] core_area_treat_k = new double[number_of_management_options];
 							
 							for (int i = 0; i < value.length; i++) {
 								if (vname[i].startsWith("D")) {
@@ -893,6 +897,9 @@ public class Main {
 										
 										area_breaks_treat_k[management_option - 1] = area_breaks_treat_k[management_option - 1] + break_area[break_id - 1][management_option - 1];
 										area_breaks_treat = area_breaks_treat + break_area[break_id - 1][management_option - 1];
+										
+										core_area_treat_k[management_option - 1] = core_area_treat_k[management_option - 1] + c[break_id - 1][management_option - 1];
+										core_area_treat = core_area_treat + c[break_id - 1][management_option - 1];
 									}
 								}
 							}
@@ -900,16 +907,16 @@ public class Main {
 							double length_breaks_no_treat = length_of_fuelbreaks - length_breaks_treat;
 							
 							fileOut.write("test case" + "\t" + test_case_description);
-							fileOut.newLine(); fileOut.write("budget" + "\t" + budget);
+							fileOut.newLine(); fileOut.write("threshold for core area loss due to fuel break maintenance (acres)" + "\t" + budget);
 							fileOut.newLine(); fileOut.write("number of variables" + "\t" + cplex_total_variables); 
 							fileOut.newLine(); fileOut.write("number of constraints" + "\t" + cplex_total_constraints);
 							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
-							fileOut.newLine(); fileOut.write("solution_objective_value" + "\t" + objective_value);
-							fileOut.newLine(); fileOut.write("solution_gap" + "\t" + solution_gap);
-							fileOut.newLine(); fileOut.write("optimality_gap" + "\t" + optimality_gap);
-							fileOut.newLine(); fileOut.write("cplex_algorithm" + "\t" + cplex_algorithm);
-							fileOut.newLine(); fileOut.write("cplex_iteration" + "\t" + cplex_iteration);
-							fileOut.newLine(); fileOut.write("cplex_status" + "\t" + cplex_status);
+							fileOut.newLine(); fileOut.write("solution objective value - core area loss due to wildfire (acres)" + "\t" + objective_value);
+							fileOut.newLine(); fileOut.write("solution gap" + "\t" + solution_gap);
+							fileOut.newLine(); fileOut.write("optimality gap" + "\t" + optimality_gap);
+							fileOut.newLine(); fileOut.write("cplex algorithm" + "\t" + cplex_algorithm);
+							fileOut.newLine(); fileOut.write("cplex iteration" + "\t" + cplex_iteration);
+							fileOut.newLine(); fileOut.write("cplex status" + "\t" + cplex_status);
 							fileOut.newLine(); fileOut.write("number of fuel breaks without maintenance" + "\t" + num_breaks_no_treat);
 							fileOut.newLine(); fileOut.write("number of fuel breaks with maintenance" + "\t" + num_breaks_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
@@ -922,13 +929,16 @@ public class Main {
 								fileOut.newLine();
 								fileOut.write("total length (meters) of fuel breaks with maintenance option k = " + k + "\t" + length_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
-							fileOut.newLine(); fileOut.write("total area (acres) of fuel breaks without maintenance" + "\t" + "NA");
 							fileOut.newLine(); fileOut.write("total area (acres) of fuel breaks with maintenance" + "\t" + area_breaks_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
 								fileOut.newLine();
 								fileOut.write("total area (acres) of fuel breaks with maintenance option k = " + k + "\t" + area_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
-							
+							fileOut.newLine(); fileOut.write("total area (acres) of core area loss due to maintenance" + "\t" + core_area_treat);
+							for (int k = 1; k < number_of_management_options + 1; k++ ) {
+								fileOut.newLine();
+								fileOut.write("total area (acres) of core area loss due to maintenance option k = " + k + "\t" + core_area_treat_k[k - 1]);	// because k start from 0 in the model
+							}
 							fileOut.close();
 						} catch (IOException e) {
 							System.err.println("FileWriter(output_solution_summary_file error - "	+ e.getClass().getName() + ": " + e.getMessage());
