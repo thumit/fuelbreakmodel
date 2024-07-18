@@ -46,7 +46,7 @@ public class Main {
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
 				String test_case_description = "0%";
-				double threshold_m = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137
+				double threshold_m = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137 acres
 				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
