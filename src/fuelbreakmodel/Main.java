@@ -46,7 +46,7 @@ public class Main {
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
 				String test_case_description = "0%";
-				double budget = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137
+				double threshold_m = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137
 				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
@@ -740,7 +740,7 @@ public class Main {
 				
 				// add bounds
 				c10_lblist.add((double) 0);			// Lower bound = 0
-				c10_ublist.add(budget);				// Upper bound = budget
+				c10_ublist.add(threshold_m);				// Upper bound = budget
 				c10_num++;
 				
 				double[] c10_lb = Stream.of(c10_lblist.toArray(new Double[c10_lblist.size()])).mapToDouble(Double::doubleValue).toArray();
@@ -906,12 +906,12 @@ public class Main {
 							int num_breaks_no_treat = number_of_fuelbreaks - num_breaks_treat;
 							double length_breaks_no_treat = length_of_fuelbreaks - length_breaks_treat;
 							
-							fileOut.write("test case" + "\t" + test_case_description);
-							fileOut.newLine(); fileOut.write("threshold for core area loss due to fuel break maintenance (acres)" + "\t" + budget);
+							fileOut.write("model" + "\t" + test_case_description);
+							fileOut.newLine(); fileOut.write("threshold for core area loss due to fuel break maintenance (acres)" + "\t" + threshold_m);
 							fileOut.newLine(); fileOut.write("number of variables" + "\t" + cplex_total_variables); 
 							fileOut.newLine(); fileOut.write("number of constraints" + "\t" + cplex_total_constraints);
-							fileOut.newLine(); fileOut.write("solution_time" + "\t" + time_solving);
-							fileOut.newLine(); fileOut.write("solution objective value - core area loss due to wildfire (acres)" + "\t" + objective_value);
+							fileOut.newLine(); fileOut.write("solution time (seconds)" + "\t" + time_solving);
+							fileOut.newLine(); fileOut.write("solution objective value: total core area loss due to wildfires (acres)" + "\t" + objective_value);
 							fileOut.newLine(); fileOut.write("solution gap" + "\t" + solution_gap);
 							fileOut.newLine(); fileOut.write("optimality gap" + "\t" + optimality_gap);
 							fileOut.newLine(); fileOut.write("cplex algorithm" + "\t" + cplex_algorithm);
@@ -934,10 +934,10 @@ public class Main {
 								fileOut.newLine();
 								fileOut.write("total area (acres) of fuel breaks with maintenance option k = " + k + "\t" + area_breaks_treat_k[k - 1]);	// because k start from 0 in the model
 							}
-							fileOut.newLine(); fileOut.write("total area (acres) of core area loss due to maintenance" + "\t" + core_area_treat);
+							fileOut.newLine(); fileOut.write("total area (acres) of core habitat loss due to maintenance" + "\t" + core_area_treat);
 							for (int k = 1; k < number_of_management_options + 1; k++ ) {
 								fileOut.newLine();
-								fileOut.write("total area (acres) of core area loss due to maintenance option k = " + k + "\t" + core_area_treat_k[k - 1]);	// because k start from 0 in the model
+								fileOut.write("total area (acres) of core habitat loss due to maintenance option k = " + k + "\t" + core_area_treat_k[k - 1]);	// because k start from 0 in the model
 							}
 							fileOut.close();
 						} catch (IOException e) {
