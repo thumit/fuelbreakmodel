@@ -46,15 +46,15 @@ public class Main {
 				boolean export_solution_file = false;
 				double optimality_gap = 0.000000001;		// set relative gap (Ep) to 0.000000001 is the trick achieve final solution gap 0. But try to set 0 first to see if it works
 				String test_case_description = "0%";
-				double threshold_m = 0;		// max 100% total maintenance area at 400 FT width = 29264.834517137 acres
+				double threshold_m = 0;		// max 100% total maintenance area at 400 FT width = 22017.3913934277 acres
 				boolean excluding_largest_fires = false;
 				
 				// For the Great Basin data - 2 inputs needed
 				String source_folder = get_workingLocation().replace("fuelbreakmodel", "");
-//				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 20/GB_attribute_table_2_fires_example.txt");
-				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 20/GB_attribute_table_final.txt");
-				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 20/GB_attribute_table_and_fuel_breaks_core.txt");
-				String output_folder = source_folder + "/model_outputs/Manuscript 20/" + test_case_description;
+//				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 21/GB_attribute_table_2_fires_example.txt");
+				File input_1_file = new File(source_folder + "/model_inputs/Manuscript 21/GB_attribute_table_final.txt");
+				File input_2_file = new File(source_folder + "/model_inputs/Manuscript 21/GB_attribute_table_and_fuel_breaks_core.txt");
+				String output_folder = source_folder + "/model_outputs/Manuscript 21/" + test_case_description;
 				File outputFolderFile = new File(output_folder);
 				if (!outputFolderFile.exists()) outputFolderFile.mkdirs(); 	// Create output folder and its parents if they don't exist
 				File problem_file = new File(output_folder + "/problem.lp");
