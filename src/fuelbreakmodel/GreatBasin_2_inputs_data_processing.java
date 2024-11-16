@@ -249,6 +249,7 @@ public class GreatBasin_2_inputs_data_processing {
 			}
 			
 			number_of_fuelbreaks = total_rows;
+			System.out.println("number of fuel breaks in the model = " + number_of_fuelbreaks);
 			number_of_management_options = 4;			// note k = 0, 1, 2, 3 in the model associated with k = 1, 2, 3, 4 in the manuscript_16_v4
 			break_length = new double[number_of_fuelbreaks];
 			break_area = new double[number_of_fuelbreaks][];
